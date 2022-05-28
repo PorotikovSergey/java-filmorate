@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.controller.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.IdGenerator;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -24,16 +25,14 @@ public class UserController {
         return users.values();
     }
 
-    @PostMapping(value = "/users")
+    @PostMapping("/users")
     public User create(@RequestBody User user) throws ValidationException {
+        user.setId(IdGenerator.generateUserId());
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
             log.debug("Смена имени юзера: {}", user.getName());
         }
-        if(users.containsKey(user.getId())) {
-            user.setId(user.getId()+1);
-        }
-        if (userCheck(user) && !users.containsKey(user.getId())) {
+        if (userCheck(user)) {
             users.put(user.getId(), user);
             log.debug("Добавлен юзер: {}", user);
             return user;
@@ -43,28 +42,25 @@ public class UserController {
         }
     }
 
-    @PutMapping(value = "/users")
+    @PutMapping("/users")
     public User refresh(@RequestBody User user) throws ValidationException {
+        if (user.getName().isBlank()) {
+            user.setName(user.getLogin());
+            log.debug("Смена имени юзера: {}", user.getName());
+        }
         if (userCheck(user) && !users.containsKey(user.getId())) {
-            if (user.getName().isEmpty()) {
-                user.setName(user.getLogin());
-                log.debug("Смена имени юзера: {}", user.getName());
-            }
             users.put(user.getId(), user);
             log.debug("Добавлен юзер: {}", user);
-            return user;
-        }
-        if (userCheck(user) && users.containsKey(user.getId())) {
-            if (user.getName().isBlank()) {
-                user.setName(user.getLogin());
-                log.debug("Смена имени юзера: {}", user.getName());
-            }
+            log.debug("Размер мапы с юзерами: {}", users.size());
+        } else if (userCheck(user) && users.containsKey(user.getId())) {
             users.replace(user.getId(), user);
-            log.debug("Добавлен(обновлен) юзер: {}", user);
-            return user;
+            log.debug("Обновлен юзер: {}", user);
+            log.debug("Размер мапы с юзерами: {}", users.size());
+        } else {
+            throw new ValidationException("Невозможно обновить пользователя " + user.getName() +
+                    " с логином " + user.getLogin());
         }
-        throw new ValidationException("Невозможно обновить пользователя " + user.getName() +
-                " с логином " + user.getLogin());
+        return user;
     }
 
     //---------------------Проверка юзера на соответствие-------------------------------------

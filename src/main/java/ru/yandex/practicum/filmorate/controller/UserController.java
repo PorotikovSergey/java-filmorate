@@ -13,9 +13,12 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @RestController
 public class UserController {
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final Map<Integer, User> users = new HashMap<>();
 
@@ -64,9 +67,9 @@ public class UserController {
     }
 
     //---------------------Проверка юзера на соответствие-------------------------------------
-    public static boolean userCheck(User user) {
+    public boolean userCheck(User user) {
         boolean validId = user.getId() >= 0;
-        boolean validEmail = (!user.getEmail().isBlank() && user.getEmail().contains("@"));
+        boolean validEmail = EMAIL_PATTERN.matcher(user.getEmail()).matches();
         boolean validLogin = (!(user.getLogin().isBlank()) && !user.getLogin().contains(" "));
         boolean validBirthday = user.getBirthday().isBefore(LocalDate.now());
         return (validBirthday && validLogin && validEmail && validId);

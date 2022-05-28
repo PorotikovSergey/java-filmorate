@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -75,15 +75,22 @@ class FilmControllerTest {
         film2.setReleaseDate(LocalDate.of(2020, 1, 10));
         film2.setDuration(100);
         controller.refresh(film2);
-        assertEquals("Название 2", film2.getName(), "После обновления название должно было поменяться");
-        assertEquals("Описание фильма 2", film2.getDescription(), "После обновления " +
-                "описание должно было поменяться");
-        assertEquals(100, film2.getDuration(), "После обновления длительность должна была поменяться");
-        assertEquals(LocalDate.of(2020, 01, 10), film2.getReleaseDate(),
-                "После обновления дaта релиза должна была поменяться");
-        assertEquals(1, film2.getId(), "После обновления id должен остаться прежним");
+        assertEquals(film1.getId(), film2.getId(), "После обновления id должен остаться прежним");
         assertFalse(controller.findAll().contains(film1));
         assertTrue(controller.findAll().contains(film2));
+
+        Film film3 = new Film();
+        int randomNewId = 37;
+        film3.setId(randomNewId);
+        film3.setName("Название 3");
+        film3.setDescription("Описание фильма 3");
+        film3.setReleaseDate(LocalDate.of(2000, 12, 11));
+        film3.setDuration(120);
+        controller.refresh(film3);
+        assertTrue(controller.findAll().contains(film3));
+        System.out.println(controller.findAll());
+        assertEquals(2, controller.findAll().size(), "В списке доложно быть 2 фильма-" +
+                "Один обновлённый и один новый");
     }
 
     @Test

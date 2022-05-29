@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.IdGenerator;
+import ru.yandex.practicum.filmorate.service.IdGenerator;
 
 import java.time.LocalDate;
 import java.util.Collection;

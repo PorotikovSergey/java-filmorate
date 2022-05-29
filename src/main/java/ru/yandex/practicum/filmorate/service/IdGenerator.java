@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.service;
 
 public class IdGenerator {
     private static int filmId = 0;

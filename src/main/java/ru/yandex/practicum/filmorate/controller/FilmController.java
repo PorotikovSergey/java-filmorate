@@ -18,9 +18,9 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
     private static final int MAX_DESCRIPTION_LENGTH = 200;
     private static final LocalDate FIRST_CINEMA_DATE = LocalDate.of(1895, 12, 28);
+    private final Map<Integer, Film> films = new HashMap<>();
 
     @GetMapping("/films")
     public Collection<Film> findAll() {

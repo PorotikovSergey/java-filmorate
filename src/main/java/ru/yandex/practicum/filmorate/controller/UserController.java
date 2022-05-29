@@ -29,48 +29,44 @@ public class UserController {
 
     @PostMapping("/users")
     public User create(@RequestBody User user) throws ValidationException {
+        validate(user);
         user.setId(IdGenerator.generateUserId());
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
             log.debug("Смена имени юзера: {}", user.getName());
         }
-        if (userCheck(user)) {
-            users.put(user.getId(), user);
-            log.debug("Добавлен юзер: {}", user);
-            return user;
-        } else {
-            throw new ValidationException("Невозможно добавить пользователя " + user.getName() +
-                    " с логином " + user.getLogin());
-        }
+        users.put(user.getId(), user);
+        log.debug("Добавлен юзер: {}", user);
+        return user;
     }
 
     @PutMapping("/users")
     public User refresh(@RequestBody User user) throws ValidationException {
+        validate(user);
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
             log.debug("Смена имени юзера: {}", user.getName());
         }
-        if (userCheck(user) && !users.containsKey(user.getId())) {
+        if (!users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.debug("Добавлен юзер: {}", user);
             log.debug("Размер мапы с юзерами: {}", users.size());
-        } else if (userCheck(user) && users.containsKey(user.getId())) {
+        } else {
             users.replace(user.getId(), user);
             log.debug("Обновлен юзер: {}", user);
             log.debug("Размер мапы с юзерами: {}", users.size());
-        } else {
-            throw new ValidationException("Невозможно обновить пользователя " + user.getName() +
-                    " с логином " + user.getLogin());
         }
         return user;
     }
 
     //---------------------Проверка юзера на соответствие-------------------------------------
-    public boolean userCheck(User user) {
+    public void validate(User user) throws ValidationException {
         boolean validId = user.getId() >= 0;
         boolean validEmail = EMAIL_PATTERN.matcher(user.getEmail()).matches();
         boolean validLogin = (!(user.getLogin().isBlank()) && !user.getLogin().contains(" "));
         boolean validBirthday = user.getBirthday().isBefore(LocalDate.now());
-        return (validBirthday && validLogin && validEmail && validId);
+        if (!(validBirthday && validLogin && validEmail && validId)) {
+            throw new ValidationException("Такого юзера нельзя зарегистрировать:" + user.getName());
+        }
     }
 }

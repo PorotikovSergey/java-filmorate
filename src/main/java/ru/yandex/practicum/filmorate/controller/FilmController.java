@@ -31,40 +31,37 @@ public class FilmController {
     @PostMapping("/films")
     public Film create(@RequestBody Film film) throws ValidationException {
         film.setId(IdGenerator.generateFilmId());
-        if (filmCheck(film)) {
-            films.put(film.getId(), film);
-            log.debug("Добавлен фильм: {}", film);
-            log.debug("Размер мапы с фильмами: {}", films.size());
-        } else {
-            log.debug("{} не прошёл проверку на соответствие", film.getName());
-            throw new ValidationException("Невозможно запостить фильм " + film.getName());
-        }
+        validate(film);
+        films.put(film.getId(), film);
+        log.debug("Добавлен фильм: {}", film);
+        log.debug("Размер мапы с фильмами: {}", films.size());
         return film;
     }
 
     @PutMapping("/films")
     public Film refresh(@RequestBody Film film) throws ValidationException {
-        if (filmCheck(film) && !films.containsKey(film.getId())) {
+        validate(film);
+        if (!films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.debug("Обновлён(добавлен) фильм: {}", film);
             log.debug("Размер мапы с фильмами-{} после обновления(добавления) фильма: {}", films.size(), film);
-        } else if (filmCheck(film) && films.containsKey(film.getId())) {
+        } else {
             films.replace(film.getId(), film);
             log.debug("Обновлён фильм: {}", film);
             log.debug("Размер мапы с фильмами-{} после обновления фильма: {}", films.size(), film);
-        } else {
-            throw new ValidationException("Невозможно обновить фильм " + film.getName());
         }
         return film;
     }
 
     //-------------------Проверка фильма на соотвтетствие-----------------------------------------
-    private boolean filmCheck(Film film) {
+    private void validate(Film film) throws ValidationException {
         boolean validId = film.getId() >= 0;
         boolean validName = !film.getName().isBlank();
         boolean validDescription = film.getDescription().length() <= MAX_DESCRIPTION_LENGTH;
         boolean validDate = film.getReleaseDate().isAfter(FIRST_CINEMA_DATE);
         boolean validDuration = film.getDuration() >= 0;
-        return (validDate && validDuration && validDescription && validId && validName);
+        if (!(validDate && validDuration && validDescription && validId && validName)) {
+            throw new ValidationException("Невозможно запостить фильм " + film.getName());
+        }
     }
 }

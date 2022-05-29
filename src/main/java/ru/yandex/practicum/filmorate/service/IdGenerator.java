@@ -14,4 +14,12 @@ public class IdGenerator {
     public static int generateUserId() {
         return ++userId;
     }
+
+    public static void setFilmId(int filmId) {
+        IdGenerator.filmId = filmId;
+    }
+
+    public static void setUserId(int userId) {
+        IdGenerator.userId = userId;
+    }
 }

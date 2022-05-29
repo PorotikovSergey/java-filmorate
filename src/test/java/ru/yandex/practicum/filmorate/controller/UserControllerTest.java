@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.IdGenerator;
 
 import java.time.LocalDate;
 
@@ -11,8 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
     UserController controller = new UserController();
 
+    @BeforeEach
+    void clear() {
+        IdGenerator.setUserId(0);
+    }
+
     @Test
-    void createUsersRight() throws ValidationException {
+    void createUserRight() throws ValidationException {
         User user = new User();
         user.setName("Вася");
         user.setLogin("Нагибатор3000");
@@ -24,7 +31,10 @@ class UserControllerTest {
         assertEquals("nagibator@mail.ru", user.getEmail(), "Длительность не совпадает");
         assertEquals(1, user.getId(), "Id не совпадает");
         assertEquals("1999-06-26", user.getBirthday().toString(), "День рожденья не совпадает");
+    }
 
+    @Test
+    void createUserWithEmptyNameRight() throws ValidationException {
         User user2 = new User();
         user2.setName("");
         user2.setLogin("Нагибатор3001");
@@ -33,7 +43,10 @@ class UserControllerTest {
         controller.create(user2);
         assertEquals("Нагибатор3001", user2.getName(), "Пустое имя должно было смениться на логин");
         assertEquals("Нагибатор3001", user2.getLogin(), "Логин должен был остаться прежним");
+    }
 
+    @Test
+    void doNotCreateUserWithWrongEmail() {
         User user3 = new User();
         user3.setName("Петя");
         user3.setLogin("Мамколюб1997");
@@ -43,7 +56,10 @@ class UserControllerTest {
             controller.create(user3);
         });
         assertNotNull(thrown.getMessage(), "Нельзя добавить юзера с неправильным email: " + user3.getEmail());
+    }
 
+    @Test
+    void doNotCreateUserFromFuture() {
         User user4 = new User();
         user4.setName("Алёша");
         user4.setLogin("AlEx");
@@ -53,9 +69,6 @@ class UserControllerTest {
             controller.create(user4);
         });
         assertNotNull(thrown2.getMessage(), "Нельзя добавить юзера из будущего");
-
-        assertEquals(2, controller.findAll().size(), "В список в итоге должен был добавиться "
-                + "только два первых юзера");
     }
 
     @Test
@@ -66,7 +79,6 @@ class UserControllerTest {
         user.setEmail("nagibator@mail.ru");
         user.setBirthday(LocalDate.of(1999, 6, 26));
         controller.create(user);
-        assertEquals("Вася", user.getName(), "Имена не совпадает");
 
         User user2 = new User();
         user2.setId(user.getId());
@@ -78,6 +90,16 @@ class UserControllerTest {
         assertFalse(controller.findAll().contains(user), "Юзера не должно было остаться");
         assertTrue(controller.findAll().contains(user2), "Юзер2 не должен был заменить юзера");
         assertEquals(user.getId(), user2.getId(), "Id у юзера2 должен был стать у первого юзера раньше");
+    }
+
+    @Test
+    void refreshUserWithNewIdRight() throws ValidationException {
+        User user = new User();
+        user.setName("Вася");
+        user.setLogin("Нагибатор3000");
+        user.setEmail("nagibator@mail.ru");
+        user.setBirthday(LocalDate.of(1999, 6, 26));
+        controller.create(user);
 
         User user3 = new User();
         user3.setName("Миша");
@@ -86,13 +108,40 @@ class UserControllerTest {
         user3.setBirthday(LocalDate.of(2001, 11, 11));
         controller.refresh(user3);
 
+        assertTrue(controller.findAll().contains(user), "Юзера должен был остаться");
+        assertTrue(controller.findAll().contains(user3), "Юзер3 должен был просто добавиться");
+    }
+
+    @Test
+    void refreshUserWithEmptyName() throws ValidationException {
+        User user = new User();
+        user.setName("Вася");
+        user.setLogin("Нагибатор3000");
+        user.setEmail("nagibator@mail.ru");
+        user.setBirthday(LocalDate.of(1999, 6, 26));
+        controller.create(user);
+
         User user4 = new User();
+        user4.setId(user.getId());
         user4.setName("");
         user4.setLogin("Нагибаторщик");
         user4.setEmail("nagibator@69mail.com");
         user4.setBirthday(LocalDate.of(2001, 11, 11));
         controller.refresh(user4);
+
         assertEquals("Нагибаторщик", user4.getName(), "Пустое имя должно было смениться на логин");
+        assertFalse(controller.findAll().contains(user), "Юзер должен был удалиться");
+        assertTrue(controller.findAll().contains(user4), "Юзер4 должен был просто добавиться вместо первого");
+    }
+
+    @Test
+    void refreshUserWithWrongEmail() throws ValidationException {
+        User user = new User();
+        user.setName("Вася");
+        user.setLogin("Нагибатор3000");
+        user.setEmail("nagibator@mail.ru");
+        user.setBirthday(LocalDate.of(1999, 6, 26));
+        controller.create(user);
 
         User user5 = new User();
         user5.setName("Володя");
@@ -102,10 +151,9 @@ class UserControllerTest {
         Throwable thrown = assertThrows(ValidationException.class, () -> {
             controller.create(user5);
         });
-        assertNotNull(thrown.getMessage(), "Нельзя обновить юзера с неправильной почтой");
 
-        assertEquals(2, controller.findAll().size(), "В списке должно быть 3 юзера." +
-                "Один обновился, второй добавился, третий добавился с изменением имени на логин");
+        assertNotNull(thrown.getMessage(), "Нельзя обновить юзера с неправильной почтой");
+        assertFalse(controller.findAll().contains(user5), "Юзер5 не должен был просто добавиться");
     }
 
     @Test

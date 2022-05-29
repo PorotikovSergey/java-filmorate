@@ -12,7 +12,7 @@ class FilmControllerTest {
     private FilmController controller = new FilmController();
 
     @Test
-    void addFilmsRight() throws ValidationException {
+    void addFilmRight() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Название");
         film1.setDescription("Описание фильма");
@@ -23,7 +23,10 @@ class FilmControllerTest {
         assertEquals("Описание фильма", film1.getDescription(), "Описание не совпадает");
         assertEquals(1000, film1.getDuration(), "Длительность не совпадает");
         assertEquals("2022-01-10", film1.getReleaseDate().toString(), "Описание не совпадает");
+    }
 
+    @Test
+    void doNotAddFilmWithOutName() throws ValidationException {
         Film film2 = new Film();
         film2.setName("");
         film2.setDescription("Описание второго фильма без названия");
@@ -33,7 +36,10 @@ class FilmControllerTest {
             controller.create(film2);
         });
         assertNotNull(thrown1.getMessage(), "Невозможно запостить фильм без названия");
+    }
 
+    @Test
+    void doNotAddFilmWithNegativeDuration() throws ValidationException {
         Film film3 = new Film();
         film3.setName("Вот так");
         film3.setDescription("Описание фильма с отрицательной длительностью");
@@ -43,7 +49,10 @@ class FilmControllerTest {
             controller.create(film3);
         });
         assertNotNull(thrown2.getMessage(), "Невозможно запостить фильм с отрицательной длительностью");
+    }
 
+    @Test
+    void doNotAddSoOldFilm() throws ValidationException {
         Film film4 = new Film();
         film4.setName("Привет");
         film4.setDescription("Описание фильма из прошлого");
@@ -52,10 +61,7 @@ class FilmControllerTest {
         Throwable thrown4 = assertThrows(ValidationException.class, () -> {
             controller.create(film4);
         });
-        assertNotNull(thrown1.getMessage(), "Невозможно запостить такой старый фильм");
-
-        assertEquals(1, controller.findAll().size(), "В список в итоге должен был добавиться "
-                + "только один первый фильм");
+        assertNotNull(thrown4.getMessage(), "Невозможно запостить такой старый фильм");
     }
 
     @Test
@@ -66,7 +72,6 @@ class FilmControllerTest {
         film1.setReleaseDate(LocalDate.of(2022, 1, 10));
         film1.setDuration(1000);
         controller.create(film1);
-        assertEquals("Название", film1.getName(), "Название не совпадает");
 
         Film film2 = new Film();
         film2.setId(film1.getId());
@@ -79,6 +84,18 @@ class FilmControllerTest {
         assertFalse(controller.findAll().contains(film1));
         assertTrue(controller.findAll().contains(film2));
 
+        assertEquals(1, controller.findAll().size(), "В списке доложно быть только 1 фильм");
+    }
+
+    @Test
+    void refreshFilmWithNewIdRight() throws ValidationException {
+        Film film1 = new Film();
+        film1.setName("Название");
+        film1.setDescription("Описание фильма");
+        film1.setReleaseDate(LocalDate.of(2022, 1, 10));
+        film1.setDuration(1000);
+        controller.create(film1);
+
         Film film3 = new Film();
         int randomNewId = 37;
         film3.setId(randomNewId);
@@ -89,8 +106,7 @@ class FilmControllerTest {
         controller.refresh(film3);
         assertTrue(controller.findAll().contains(film3));
         System.out.println(controller.findAll());
-        assertEquals(2, controller.findAll().size(), "В списке доложно быть 2 фильма-" +
-                "Один обновлённый и один новый");
+        assertEquals(2, controller.findAll().size(), "В списке доложно быть 2 фильма");
     }
 
     @Test

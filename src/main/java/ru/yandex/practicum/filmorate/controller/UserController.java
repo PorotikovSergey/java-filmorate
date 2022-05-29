@@ -60,7 +60,7 @@ public class UserController {
     }
 
     //---------------------Проверка юзера на соответствие-------------------------------------
-    public void validate(User user) throws ValidationException {
+    private void validate(User user) throws ValidationException {
         boolean validId = user.getId() >= 0;
         boolean validEmail = EMAIL_PATTERN.matcher(user.getEmail()).matches();
         boolean validLogin = (!(user.getLogin().isBlank()) && !user.getLogin().contains(" "));

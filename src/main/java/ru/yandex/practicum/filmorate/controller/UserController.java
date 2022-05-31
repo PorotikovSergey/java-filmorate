@@ -1,17 +1,15 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.service.IdGenerator;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.IdGenerator;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -61,12 +59,18 @@ public class UserController {
 
     //---------------------Проверка юзера на соответствие-------------------------------------
     private void validate(User user) throws ValidationException {
-        boolean validId = user.getId() >= 0;
-        boolean validEmail = EMAIL_PATTERN.matcher(user.getEmail()).matches();
-        boolean validLogin = (!(user.getLogin().isBlank()) && !user.getLogin().contains(" "));
-        boolean validBirthday = user.getBirthday().isBefore(LocalDate.now());
-        if (!(validBirthday && validLogin && validEmail && validId)) {
-            throw new ValidationException("Такого юзера нельзя зарегистрировать:" + user.getName());
+        if (user.getId() < 0) {
+            throw new ValidationException("Id юзера не может быть отрицательным. " +
+                    "Вы пытаетесь задать id: " + user.getId());
+        }
+        if (!EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
+            throw new ValidationException("Email " + user.getEmail() + " не соответсвтует требованиям.");
+        }
+        if ((user.getLogin().isBlank()) || user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин " + user.getLogin() + " не соответствет требованиям.");
+        }
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Указанная дата рождения " + user.getBirthday() + " находится в будущем.");
         }
     }
 }

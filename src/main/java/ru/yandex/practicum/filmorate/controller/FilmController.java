@@ -55,13 +55,23 @@ public class FilmController {
 
     //-------------------Проверка фильма на соотвтетствие-----------------------------------------
     private void validate(Film film) throws ValidationException {
-        boolean validId = film.getId() >= 0;
-        boolean validName = !film.getName().isBlank();
-        boolean validDescription = film.getDescription().length() <= MAX_DESCRIPTION_LENGTH;
-        boolean validDate = film.getReleaseDate().isAfter(FIRST_CINEMA_DATE);
-        boolean validDuration = film.getDuration() >= 0;
-        if (!(validDate && validDuration && validDescription && validId && validName)) {
-            throw new ValidationException("Невозможно запостить фильм " + film.getName());
+        if (film.getId() < 0) {
+            throw new ValidationException("Id фильма не может быть отрицательным. " +
+                    "Вы пытаетесь задать id: " + film.getId());
+        }
+        if (film.getName().isBlank()) {
+            throw new ValidationException("Невозможно запостить фильм c пустым названием.");
+        }
+        if (film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
+            throw new ValidationException("Невозможно запостить фильм  с описанием больше "
+                    + MAX_DESCRIPTION_LENGTH + " символов");
+        }
+        if (film.getReleaseDate().isBefore(FIRST_CINEMA_DATE)) {
+            throw new ValidationException("Невозможно запостить фильм с датой выпуска раньше " + FIRST_CINEMA_DATE);
+        }
+        if (film.getDuration() < 0) {
+            throw new ValidationException("Невозможно запостить фильм с отрицательной длительностью: "
+                    + film.getDuration());
         }
     }
 }

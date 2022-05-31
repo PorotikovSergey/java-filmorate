@@ -9,128 +9,128 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
-    private FilmController controller = new FilmController();
+    private final FilmController controller = new FilmController();
 
     @Test
     void addFilmRight() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Название");
-        film1.setDescription("Описание фильма");
-        film1.setReleaseDate(LocalDate.of(2022, 1, 10));
-        film1.setDuration(1000);
-        controller.create(film1);
-        assertEquals("Название", film1.getName(), "Название не совпадает");
-        assertEquals("Описание фильма", film1.getDescription(), "Описание не совпадает");
-        assertEquals(1000, film1.getDuration(), "Длительность не совпадает");
-        assertEquals("2022-01-10", film1.getReleaseDate().toString(), "Описание не совпадает");
+        Film film = new Film();
+        film.setName("Название");
+        film.setDescription("Описание фильма");
+        film.setReleaseDate(LocalDate.of(2022, 1, 10));
+        film.setDuration(1000);
+        controller.create(film);
+        assertEquals("Название", film.getName(), "Название не совпадает");
+        assertEquals("Описание фильма", film.getDescription(), "Описание не совпадает");
+        assertEquals(1000, film.getDuration(), "Длительность не совпадает");
+        assertEquals("2022-01-10", film.getReleaseDate().toString(), "Описание не совпадает");
     }
 
     @Test
     void doNotAddFilmWithOutName() throws ValidationException {
-        Film film2 = new Film();
-        film2.setName("");
-        film2.setDescription("Описание второго фильма без названия");
-        film2.setReleaseDate(LocalDate.of(2010, 5, 13));
-        film2.setDuration(100);
+        Film film = new Film();
+        film.setName("");
+        film.setDescription("Описание второго фильма без названия");
+        film.setReleaseDate(LocalDate.of(2010, 5, 13));
+        film.setDuration(100);
         Throwable thrown1 = assertThrows(ValidationException.class, () -> {
-            controller.create(film2);
+            controller.create(film);
         });
         assertNotNull(thrown1.getMessage(), "Невозможно запостить фильм без названия");
     }
 
     @Test
     void doNotAddFilmWithNegativeDuration() throws ValidationException {
-        Film film3 = new Film();
-        film3.setName("Вот так");
-        film3.setDescription("Описание фильма с отрицательной длительностью");
-        film3.setReleaseDate(LocalDate.of(2010, 5, 13));
-        film3.setDuration(-100);
+        Film film = new Film();
+        film.setName("Вот так");
+        film.setDescription("Описание фильма с отрицательной длительностью");
+        film.setReleaseDate(LocalDate.of(2010, 5, 13));
+        film.setDuration(-100);
         Throwable thrown2 = assertThrows(ValidationException.class, () -> {
-            controller.create(film3);
+            controller.create(film);
         });
         assertNotNull(thrown2.getMessage(), "Невозможно запостить фильм с отрицательной длительностью");
     }
 
     @Test
     void doNotAddSoOldFilm() throws ValidationException {
-        Film film4 = new Film();
-        film4.setName("Привет");
-        film4.setDescription("Описание фильма из прошлого");
-        film4.setReleaseDate(LocalDate.of(1050, 5, 13));
-        film4.setDuration(100);
+        Film film = new Film();
+        film.setName("Привет");
+        film.setDescription("Описание фильма из прошлого");
+        film.setReleaseDate(LocalDate.of(1050, 5, 13));
+        film.setDuration(100);
         Throwable thrown4 = assertThrows(ValidationException.class, () -> {
-            controller.create(film4);
+            controller.create(film);
         });
         assertNotNull(thrown4.getMessage(), "Невозможно запостить такой старый фильм");
     }
 
     @Test
     void refreshFilmsRight() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Название");
-        film1.setDescription("Описание фильма");
-        film1.setReleaseDate(LocalDate.of(2022, 1, 10));
-        film1.setDuration(1000);
-        controller.create(film1);
+        Film film = new Film();
+        film.setName("Название");
+        film.setDescription("Описание фильма");
+        film.setReleaseDate(LocalDate.of(2022, 1, 10));
+        film.setDuration(1000);
+        controller.create(film);
 
-        Film film2 = new Film();
-        film2.setId(film1.getId());
-        film2.setName("Название 2");
-        film2.setDescription("Описание фильма 2");
-        film2.setReleaseDate(LocalDate.of(2020, 1, 10));
-        film2.setDuration(100);
-        controller.refresh(film2);
-        assertEquals(film1.getId(), film2.getId(), "После обновления id должен остаться прежним");
-        assertFalse(controller.findAll().contains(film1));
-        assertTrue(controller.findAll().contains(film2));
+        Film newFilm = new Film();
+        newFilm.setId(film.getId());
+        newFilm.setName("Название 2");
+        newFilm.setDescription("Описание фильма 2");
+        newFilm.setReleaseDate(LocalDate.of(2020, 1, 10));
+        newFilm.setDuration(100);
+        controller.refresh(newFilm);
+        assertEquals(film.getId(), newFilm.getId(), "После обновления id должен остаться прежним");
+        assertFalse(controller.findAll().contains(film));
+        assertTrue(controller.findAll().contains(newFilm));
 
         assertEquals(1, controller.findAll().size(), "В списке доложно быть только 1 фильм");
     }
 
     @Test
     void refreshFilmWithNewIdRight() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Название");
-        film1.setDescription("Описание фильма");
-        film1.setReleaseDate(LocalDate.of(2022, 1, 10));
-        film1.setDuration(1000);
-        controller.create(film1);
+        Film film = new Film();
+        film.setName("Название");
+        film.setDescription("Описание фильма");
+        film.setReleaseDate(LocalDate.of(2022, 1, 10));
+        film.setDuration(1000);
+        controller.create(film);
 
-        Film film3 = new Film();
+        Film newFilm = new Film();
         int randomNewId = 37;
-        film3.setId(randomNewId);
-        film3.setName("Название 3");
-        film3.setDescription("Описание фильма 3");
-        film3.setReleaseDate(LocalDate.of(2000, 12, 11));
-        film3.setDuration(120);
-        controller.refresh(film3);
-        assertTrue(controller.findAll().contains(film3));
+        newFilm.setId(randomNewId);
+        newFilm.setName("Название 3");
+        newFilm.setDescription("Описание фильма 3");
+        newFilm.setReleaseDate(LocalDate.of(2000, 12, 11));
+        newFilm.setDuration(120);
+        controller.refresh(newFilm);
+        assertTrue(controller.findAll().contains(newFilm));
         System.out.println(controller.findAll());
         assertEquals(2, controller.findAll().size(), "В списке доложно быть 2 фильма");
     }
 
     @Test
     void returnRightSize() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Название 1");
-        film1.setDescription("Описание фильма 1");
-        film1.setReleaseDate(LocalDate.of(1950, 1, 10));
-        film1.setDuration(10);
-        controller.create(film1);
+        Film film = new Film();
+        film.setName("Название 1");
+        film.setDescription("Описание фильма 1");
+        film.setReleaseDate(LocalDate.of(1950, 1, 10));
+        film.setDuration(10);
+        controller.create(film);
 
-        Film film2 = new Film();
-        film2.setName("Название 2");
-        film2.setDescription("Описание фильма 2");
-        film2.setReleaseDate(LocalDate.of(1990, 6, 20));
-        film2.setDuration(100);
-        controller.create(film2);
+        Film newFilm = new Film();
+        newFilm.setName("Название 2");
+        newFilm.setDescription("Описание фильма 2");
+        newFilm.setReleaseDate(LocalDate.of(1990, 6, 20));
+        newFilm.setDuration(100);
+        controller.create(newFilm);
 
-        Film film3 = new Film();
-        film3.setName("Название 3");
-        film3.setDescription("Описание фильма 3");
-        film3.setReleaseDate(LocalDate.of(2020, 12, 30));
-        film3.setDuration(1000);
-        controller.create(film3);
+        Film oneMoreFilm = new Film();
+        oneMoreFilm.setName("Название 3");
+        oneMoreFilm.setDescription("Описание фильма 3");
+        oneMoreFilm.setReleaseDate(LocalDate.of(2020, 12, 30));
+        oneMoreFilm.setDuration(1000);
+        controller.create(oneMoreFilm);
 
         assertEquals(3, controller.findAll().size(), "Список должен состоять из 3 фильмов");
     }

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
-    UserController controller = new UserController();
+    private final UserController controller = new UserController();
 
     @BeforeEach
     void clear() {
@@ -35,38 +35,38 @@ class UserControllerTest {
 
     @Test
     void createUserWithEmptyNameRight() throws ValidationException {
-        User user2 = new User();
-        user2.setName("");
-        user2.setLogin("Нагибатор3001");
-        user2.setEmail("nagibator@mail.com");
-        user2.setBirthday(LocalDate.of(1998, 10, 26));
-        controller.create(user2);
-        assertEquals("Нагибатор3001", user2.getName(), "Пустое имя должно было смениться на логин");
-        assertEquals("Нагибатор3001", user2.getLogin(), "Логин должен был остаться прежним");
+        User user = new User();
+        user.setName("");
+        user.setLogin("Нагибатор3001");
+        user.setEmail("nagibator@mail.com");
+        user.setBirthday(LocalDate.of(1998, 10, 26));
+        controller.create(user);
+        assertEquals("Нагибатор3001", user.getName(), "Пустое имя должно было смениться на логин");
+        assertEquals("Нагибатор3001", user.getLogin(), "Логин должен был остаться прежним");
     }
 
     @Test
     void doNotCreateUserWithWrongEmail() {
-        User user3 = new User();
-        user3.setName("Петя");
-        user3.setLogin("Мамколюб1997");
-        user3.setEmail("motherloverAmail.com");
-        user3.setBirthday(LocalDate.of(1997, 10, 26));
+        User user = new User();
+        user.setName("Петя");
+        user.setLogin("Мамколюб1997");
+        user.setEmail("motherloverAmail.com");
+        user.setBirthday(LocalDate.of(1997, 10, 26));
         Throwable thrown = assertThrows(ValidationException.class, () -> {
-            controller.create(user3);
+            controller.create(user);
         });
-        assertNotNull(thrown.getMessage(), "Нельзя добавить юзера с неправильным email: " + user3.getEmail());
+        assertNotNull(thrown.getMessage(), "Нельзя добавить юзера с неправильным email: " + user.getEmail());
     }
 
     @Test
     void doNotCreateUserFromFuture() {
-        User user4 = new User();
-        user4.setName("Алёша");
-        user4.setLogin("AlEx");
-        user4.setEmail("alexey@gmail.com");
-        user4.setBirthday(LocalDate.of(3000, 10, 26));
+        User user = new User();
+        user.setName("Алёша");
+        user.setLogin("AlEx");
+        user.setEmail("alexey@gmail.com");
+        user.setBirthday(LocalDate.of(3000, 10, 26));
         Throwable thrown2 = assertThrows(ValidationException.class, () -> {
-            controller.create(user4);
+            controller.create(user);
         });
         assertNotNull(thrown2.getMessage(), "Нельзя добавить юзера из будущего");
     }
@@ -80,16 +80,16 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1999, 6, 26));
         controller.create(user);
 
-        User user2 = new User();
-        user2.setId(user.getId());
-        user2.setName("Петя");
-        user2.setLogin("Нагибатор3333");
-        user2.setEmail("nagibator3333@mail.com");
-        user2.setBirthday(LocalDate.of(2000, 10, 21));
-        controller.refresh(user2);
+        User newUser = new User();
+        newUser.setId(user.getId());
+        newUser.setName("Петя");
+        newUser.setLogin("Нагибатор3333");
+        newUser.setEmail("nagibator3333@mail.com");
+        newUser.setBirthday(LocalDate.of(2000, 10, 21));
+        controller.refresh(newUser);
         assertFalse(controller.findAll().contains(user), "Юзера не должно было остаться");
-        assertTrue(controller.findAll().contains(user2), "Юзер2 не должен был заменить юзера");
-        assertEquals(user.getId(), user2.getId(), "Id у юзера2 должен был стать у первого юзера раньше");
+        assertTrue(controller.findAll().contains(newUser), "Юзер2 не должен был заменить юзера");
+        assertEquals(user.getId(), newUser.getId(), "Id у юзера2 должен был стать у первого юзера раньше");
     }
 
     @Test
@@ -101,15 +101,15 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1999, 6, 26));
         controller.create(user);
 
-        User user3 = new User();
-        user3.setName("Миша");
-        user3.setLogin("Нагибатор1");
-        user3.setEmail("nagibator1@mail.com");
-        user3.setBirthday(LocalDate.of(2001, 11, 11));
-        controller.refresh(user3);
+        User newUser = new User();
+        newUser.setName("Миша");
+        newUser.setLogin("Нагибатор1");
+        newUser.setEmail("nagibator1@mail.com");
+        newUser.setBirthday(LocalDate.of(2001, 11, 11));
+        controller.refresh(newUser);
 
         assertTrue(controller.findAll().contains(user), "Юзера должен был остаться");
-        assertTrue(controller.findAll().contains(user3), "Юзер3 должен был просто добавиться");
+        assertTrue(controller.findAll().contains(newUser), "Юзер3 должен был просто добавиться");
     }
 
     @Test
@@ -121,17 +121,17 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1999, 6, 26));
         controller.create(user);
 
-        User user4 = new User();
-        user4.setId(user.getId());
-        user4.setName("");
-        user4.setLogin("Нагибаторщик");
-        user4.setEmail("nagibator@69mail.com");
-        user4.setBirthday(LocalDate.of(2001, 11, 11));
-        controller.refresh(user4);
+        User newUser = new User();
+        newUser.setId(user.getId());
+        newUser.setName("");
+        newUser.setLogin("Нагибаторщик");
+        newUser.setEmail("nagibator@69mail.com");
+        newUser.setBirthday(LocalDate.of(2001, 11, 11));
+        controller.refresh(newUser);
 
-        assertEquals("Нагибаторщик", user4.getName(), "Пустое имя должно было смениться на логин");
+        assertEquals("Нагибаторщик", newUser.getName(), "Пустое имя должно было смениться на логин");
         assertFalse(controller.findAll().contains(user), "Юзер должен был удалиться");
-        assertTrue(controller.findAll().contains(user4), "Юзер4 должен был просто добавиться вместо первого");
+        assertTrue(controller.findAll().contains(newUser), "Юзер4 должен был просто добавиться вместо первого");
     }
 
     @Test
@@ -143,17 +143,17 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1999, 6, 26));
         controller.create(user);
 
-        User user5 = new User();
-        user5.setName("Володя");
-        user5.setLogin("Нагибаторщик");
-        user5.setEmail("nagibator69mail.com");
-        user5.setBirthday(LocalDate.of(2001, 11, 11));
+        User newUser = new User();
+        newUser.setName("Володя");
+        newUser.setLogin("Нагибаторщик");
+        newUser.setEmail("nagibator69mail.com");
+        newUser.setBirthday(LocalDate.of(2001, 11, 11));
         Throwable thrown = assertThrows(ValidationException.class, () -> {
-            controller.create(user5);
+            controller.create(newUser);
         });
 
         assertNotNull(thrown.getMessage(), "Нельзя обновить юзера с неправильной почтой");
-        assertFalse(controller.findAll().contains(user5), "Юзер5 не должен был просто добавиться");
+        assertFalse(controller.findAll().contains(newUser), "Юзер5 не должен был просто добавиться");
     }
 
     @Test
@@ -165,19 +165,19 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1999, 6, 26));
         controller.create(user);
 
-        User user2 = new User();
-        user2.setName("Петя");
-        user2.setLogin("Нагибатор2000");
-        user2.setEmail("nagibator2000@mail.ru");
-        user2.setBirthday(LocalDate.of(1998, 6, 26));
-        controller.create(user2);
+        User newUser = new User();
+        newUser.setName("Петя");
+        newUser.setLogin("Нагибатор2000");
+        newUser.setEmail("nagibator2000@mail.ru");
+        newUser.setBirthday(LocalDate.of(1998, 6, 26));
+        controller.create(newUser);
 
-        User user3 = new User();
-        user3.setName("");
-        user3.setLogin("Нагибатор3000");
-        user3.setEmail("nagibator1000@mail.ru");
-        user3.setBirthday(LocalDate.of(1997, 6, 26));
-        controller.create(user3);
+        User oneMoreUser = new User();
+        oneMoreUser.setName("");
+        oneMoreUser.setLogin("Нагибатор3000");
+        oneMoreUser.setEmail("nagibator1000@mail.ru");
+        oneMoreUser.setBirthday(LocalDate.of(1997, 6, 26));
+        controller.create(oneMoreUser);
 
         assertEquals(3, controller.findAll().size(), "В списке должно быть 3 юзера");
     }

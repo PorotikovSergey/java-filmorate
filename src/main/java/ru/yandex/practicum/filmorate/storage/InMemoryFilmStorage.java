@@ -60,6 +60,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values();
     }
 
+    public Film getFilmDyId(int id) {
+        return films.get(id);
+    }
+
     //-----------------------Валидация-------------------------------------------------------------------------------
     private void validate(Film film) throws ValidationException {
         if (film.getId() < 0) {

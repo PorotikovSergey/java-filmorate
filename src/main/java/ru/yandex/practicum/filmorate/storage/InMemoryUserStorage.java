@@ -70,6 +70,10 @@ public class InMemoryUserStorage implements UserStorage{
         return user;
     }
 
+    public User getUserById(int id) {
+        return users.get(id);
+    }
+
 //----------------------------Валидация---------------------------------------------------------------
     private void validate(User user) throws ValidationException {
         if (user.getId() < 0) {

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -13,7 +14,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 @Slf4j
-@Service
+@Component
 public class InMemoryUserStorage implements UserStorage{
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.IdGenerator;
@@ -19,7 +20,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
 
     @Override
-    public Film addFilm(Film film) throws ValidationException {
+    public Film addFilm(Film film) {
         film.setId(IdGenerator.generateFilmId());
         validate(film);
         films.put(film.getId(), film);
@@ -35,12 +36,12 @@ public class InMemoryFilmStorage implements FilmStorage {
             return film;
         } else {
             log.debug("Фильма с Id {} не существует", film.getId());
-            return null;        //Вот тут надо как-то по-другому! НЕ ЗАБЫТЬ ИСПРАВИТЬ!!!
+            throw new NotFoundException("Фильма с таким Id не существует");
         }
     }
 
     @Override
-    public Film modifyFilm(Film film) throws ValidationException {
+    public Film modifyFilm(Film film) {
         validate(film);
         if (!films.containsKey(film.getId())) {
             films.put(film.getId(), film);
@@ -65,7 +66,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     //-----------------------Валидация-------------------------------------------------------------------------------
-    private void validate(Film film) throws ValidationException {
+    private void validate(Film film) {
         if (film.getId() < 0) {
             throw new ValidationException("Id фильма не может быть отрицательным. " +
                     "Вы пытаетесь задать id: " + film.getId());

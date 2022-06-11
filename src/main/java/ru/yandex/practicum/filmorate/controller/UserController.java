@@ -9,9 +9,6 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -36,7 +33,7 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public User refresh(@RequestBody User user) throws ValidationException {
+    public User refresh(@RequestBody User user) {
         return storage.modifyUser(user);
     }
 
@@ -45,26 +42,29 @@ public class UserController {
         return storage.deleteUser(user);
     }
 
+    @GetMapping("/users/{id}")
+    public User getUserById(@PathVariable int id) {
+        return storage.getUserById(id);
+    }
+
     //--------------------------Переменная пути--------------------------------------------
     @PutMapping("/users/{id}/friends/{friendId}")
     public void setFriendship(@PathVariable int id, @PathVariable int friendId) {
-        service.setFriendship(storage.getUserById(id), storage.getUserById(friendId));
+        service.setFriendship(id, friendId);
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
     public void breakFriendship(@PathVariable int id, @PathVariable int friendId) {
-        service.breakFriendship(storage.getUserById(id), storage.getUserById(friendId));
+        service.breakFriendship(id, friendId);
     }
 
     @GetMapping("/users/{id}/friends")
-    public Collection<Integer> getAllFriendsIds(@PathVariable int id) {
-        return service.getAllFriendsId(storage.getUserById(id));
+    public Collection<User> getAllFriends(@PathVariable int id) {
+        return service.getAllFriendsId(id);
     }
 
     @GetMapping("/users/{id}/friends/common/{otherId}")
-    public Collection<Integer> getCommonFriendsIds(@PathVariable int id, @PathVariable int otherId) {
-        Set<Integer> commonFriends = new HashSet<>(service.getAllFriendsId(storage.getUserById(id)));
-        commonFriends.retainAll(service.getAllFriendsId(storage.getUserById(otherId)));
-        return commonFriends;
+    public Collection<User> getCommonFriendsIds(@PathVariable int id, @PathVariable int otherId) {
+        return service.getCommonFriends(id, otherId);
     }
 }

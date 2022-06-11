@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.IdGenerator;
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");
     private final Map<Integer, User> users = new HashMap<>();
@@ -28,7 +29,7 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public User addUser(User user) throws ValidationException {
+    public User addUser(User user) {
         validate(user);
         user.setId(IdGenerator.generateUserId());
         if (user.getName().isBlank()) {
@@ -46,13 +47,13 @@ public class InMemoryUserStorage implements UserStorage{
             users.remove(user.getId());
             return user;
         } else {
-            log.debug("Фильма с Id {} не существует", user.getId());
-            return null;         //Вот тут надо как-то по-другому! НЕ ЗАБЫТЬ ИСПРАВИТЬ!!!
+            log.debug("Юзера с Id {} не существует", user.getId());
+            throw new NotFoundException("Юзера с таким ID не существует");
         }
     }
 
     @Override
-    public User modifyUser(User user) throws ValidationException {
+    public User modifyUser(User user) {
         validate(user);
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -70,15 +71,17 @@ public class InMemoryUserStorage implements UserStorage{
         return user;
     }
 
-    public User getUserById(int id) {
+    public User getUserById(int id) throws ValidationException{
+        if (id < 0) {
+            throw new NotFoundException("Id не может быть меньше нуля");
+        }
         return users.get(id);
     }
 
-//----------------------------Валидация---------------------------------------------------------------
-    private void validate(User user) throws ValidationException {
+    //----------------------------Валидация---------------------------------------------------------------
+    private void validate(User user) {
         if (user.getId() < 0) {
-            throw new ValidationException("Id юзера не может быть отрицательным. " +
-                    "Вы пытаетесь задать id: " + user.getId());
+                throw new NotFoundException("Id не может быть меньше нуля");
         }
         if (!EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
             throw new ValidationException("Email " + user.getEmail() + " не соответсвтует требованиям.");

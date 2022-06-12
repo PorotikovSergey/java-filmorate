@@ -24,30 +24,40 @@ public class FilmService {
 
     public void putLike(int userId, int filmId) {
         if ((userId < 0) || (filmId < 0)) {
+            log.debug("Отрицательный id");
             throw new NotFoundException("Отрицательного id не может быть");
         }
         if (userStorage.getUserById(userId) == null) {
+            log.debug("Юзера с id {} не существует", userId);
             throw new NotFoundException("Юзера с такими id не существует");
         }
         if (filmStorage.getFilmById(filmId) == null) {
+            log.debug("Фильма с id {} не существует", userId);
             throw new NotFoundException("Фильма с такими id не существует");
         }
         filmStorage.getFilmById(filmId).getLikes().add(userId);
+        log.debug("У фильма стало {} лайков", filmStorage.getFilmById(filmId).getLikes().size());
         userStorage.getUserById(userId).getLikedFilms().add(filmId);
+        log.debug("У юзера стало {} лайкнутых фильмов", userStorage.getUserById(userId).getLikedFilms().size());
     }
 
     public void deleteLike(int userId, int filmId) {
         if ((userId < 0) || (filmId < 0)) {
+            log.debug("Отрицательный id");
             throw new NotFoundException("Отрицательного id не может быть");
         }
         if (userStorage.getUserById(userId) == null) {
+            log.debug("Юзера с id {} не существует", userId);
             throw new NotFoundException("Юзера с такими id не существует");
         }
         if (filmStorage.getFilmById(filmId) == null) {
+            log.debug("Фильма с id {} не существует", userId);
             throw new NotFoundException("Фильма с такими id не существует");
         }
         filmStorage.getFilmById(filmId).getLikes().remove(userId);
+        log.debug("У фильма стало {} лайков", filmStorage.getFilmById(filmId).getLikes().size());
         userStorage.getUserById(userId).getLikedFilms().remove(filmId);
+        log.debug("У юзера стало {} лайкнутых фильмов", userStorage.getUserById(userId).getLikedFilms().size());
     }
 
     public List<Film> getCertainAmountOfLikedFilms(int amount) {
@@ -56,6 +66,7 @@ public class FilmService {
         }
         List<Film> resultListOfBestFilms = new ArrayList<>();
         List<Film> bestFilms = new ArrayList<>(filmStorage.getAll());
+        log.debug("Всего фильмов {} ", bestFilms.size());
         if (amount > bestFilms.size()) {
             amount = bestFilms.size();
         }
@@ -63,6 +74,7 @@ public class FilmService {
         for (int i = 0; i < amount; i++) {
             resultListOfBestFilms.add(bestFilms.get(i));
         }
+        log.debug("Фильмов выдано по запросу {} ", resultListOfBestFilms.size());
         return resultListOfBestFilms;
     }
 

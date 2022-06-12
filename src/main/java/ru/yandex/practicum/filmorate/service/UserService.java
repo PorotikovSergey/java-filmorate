@@ -21,28 +21,36 @@ public class UserService {
 
     public void setFriendship(int firstId, int secondId) {
         if ((firstId < 0) || (secondId < 0)) {
+            log.debug("Отрицательный id");
             throw new NotFoundException("Отрицательного id не может быть");
         }
         userStorage.getUserById(firstId).getFriends().add(secondId);
+        log.debug("У первого юзера стало {} друзей", userStorage.getUserById(firstId).getFriends().size());
         userStorage.getUserById(secondId).getFriends().add(firstId);
+        log.debug("У второго юзера стало {} друзей", userStorage.getUserById(secondId).getFriends().size());
     }
 
     public void breakFriendship(int firstId, int secondId) {
         if ((firstId < 0) || (secondId < 0)) {
+            log.debug("Отрицательный id");
             throw new NotFoundException("Отрицательного id не может быть");
         }
         userStorage.getUserById(firstId).getFriends().remove(secondId);
+        log.debug("У первого юзера стало {} друзей", userStorage.getUserById(firstId).getFriends().size());
         userStorage.getUserById(secondId).getFriends().remove(firstId);
+        log.debug("У второго юзера стало {} друзей", userStorage.getUserById(secondId).getFriends().size());
     }
 
     public List<User> getAllFriends(int id) {
         List<User> resultList = new ArrayList<>();
         if (id < 0) {
+            log.debug("Отрицательный id");
             throw new NotFoundException("Отрицательного id не может быть");
         }
         for (Integer friendId : userStorage.getUserById(id).getFriends()) {
             resultList.add(userStorage.getUserById(friendId));
         }
+        log.debug("Друзей по запросу выдано {} ", resultList.size());
         return resultList;
     }
 
@@ -56,6 +64,7 @@ public class UserService {
         for (Integer friendId : commonFriends) {
             resultList.add(userStorage.getUserById(friendId));
         }
+        log.debug("Общих друзей по запросу выдано {} ", resultList.size());
         return resultList;
     }
 }

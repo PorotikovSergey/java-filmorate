@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -34,27 +35,27 @@ public class FilmService {
         userStorage.getUserById(userId).getLikedFilms().remove(film.getId());
     }
 
-    public List<Film> getTenBestFilms() {
-        List<Film> bestTenFilms = new ArrayList<>(filmStorage.getAll());
-        bestTenFilms.sort(new LikesComparator());
-        return bestTenFilms;
-    }
-
     public List<Film> getCertainAmountOfLikedFilms(int amount) {
-        List<Film> resultListOfBestFilms = new ArrayList<>();
-        List<Film> bestFilms = new ArrayList<>(filmStorage.getAll());
-        bestFilms.sort(new LikesComparator());
-        for (int i = 0; i<amount; i++) {
-            resultListOfBestFilms.add(bestFilms.get(i));
+        if (amount < 0) {
+            throw new NotFoundException("Отрицательного количества не может быть");
         }
-        return resultListOfBestFilms;
+        List<Film> resultListOfBestFilmsIds = new ArrayList<>();
+        List<Film> bestFilms = new ArrayList<>(filmStorage.getAll());
+        if (amount > bestFilms.size()) {
+            amount = bestFilms.size();
+        }
+        bestFilms.sort(new LikesComparator());
+        for (int i = 0; i < amount; i++) {
+            resultListOfBestFilmsIds.add(bestFilms.get(i));
+        }
+        return resultListOfBestFilmsIds;
     }
 
-//-----------------------Компаратор по лайкам-------------------------------
+    //-----------------------Компаратор по лайкам-------------------------------
     public static class LikesComparator implements Comparator<Film> {
         @Override
         public int compare(Film film1, Film film2) {
-            return film1.getLikes().size()-film2.getLikes().size();
+            return film1.getLikes().size() - film2.getLikes().size();
         }
     }
 }

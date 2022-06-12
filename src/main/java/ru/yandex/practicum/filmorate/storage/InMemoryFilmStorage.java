@@ -61,14 +61,17 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values();
     }
 
-    public Film getFilmDyId(int id) {
+    public Film getFilmById(int id) {
+        if (id < 0) {
+            throw new NotFoundException("Id не может быть меньше нуля");
+        }
         return films.get(id);
     }
 
     //-----------------------Валидация-------------------------------------------------------------------------------
     private void validate(Film film) {
         if (film.getId() < 0) {
-            throw new ValidationException("Id фильма не может быть отрицательным. " +
+            throw new NotFoundException("Id фильма не может быть отрицательным. " +
                     "Вы пытаетесь задать id: " + film.getId());
         }
         if (film.getName().isBlank()) {

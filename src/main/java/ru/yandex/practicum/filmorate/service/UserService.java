@@ -54,12 +54,12 @@ public class UserService {
     }
 
     public void putLike(User user, int filmId) {
-        filmStorage.getFilmDyId(filmId).getLikes().add(user.getId());
+        filmStorage.getFilmById(filmId).getLikes().add(user.getId());
         user.getLikedFilms().add(filmId);
     }
 
     public void deleteLike(User user, int filmId) {
-        filmStorage.getFilmDyId(filmId).getLikes().remove(user.getId());
+        filmStorage.getFilmById(filmId).getLikes().remove(user.getId());
         user.getLikedFilms().remove(filmId);
     }
 

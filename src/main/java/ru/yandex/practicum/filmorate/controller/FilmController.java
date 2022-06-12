@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
@@ -34,12 +33,12 @@ public class FilmController {
     }
 
     @PostMapping("/films")
-    public Film create(@RequestBody Film film) throws ValidationException {
+    public Film create(@RequestBody Film film) {
         return filmStorage.addFilm(film);
     }
 
     @PutMapping("/films")
-    public Film refresh(@RequestBody Film film) throws ValidationException {
+    public Film refresh(@RequestBody Film film) {
         return filmStorage.modifyFilm(film);
     }
 
@@ -48,15 +47,24 @@ public class FilmController {
         return filmStorage.deleteFilm(film);
     }
 
+    @GetMapping("/films/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        return filmStorage.getFilmById(id);
+    }
 
     @PutMapping("/films/{id}/like/{userId}")
     public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
-        service.putLike(userId, filmStorage.getFilmDyId(id));
+        service.putLike(userId, filmStorage.getFilmById(id));
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
-        service.deleteLike(userId, filmStorage.getFilmDyId(id));
+        service.deleteLike(userId, filmStorage.getFilmById(id));
+    }
+
+    @GetMapping("/films/popular")
+    public List<Film> getCertainAmountOfLikedFilms() {
+        return service.getCertainAmountOfLikedFilms(10);
     }
 
     @GetMapping("/films/popular?count={count}")

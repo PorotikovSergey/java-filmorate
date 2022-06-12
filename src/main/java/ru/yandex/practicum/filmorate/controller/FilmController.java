@@ -54,24 +54,21 @@ public class FilmController {
 
     @PutMapping("/films/{id}/like/{userId}")
     public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
-        service.putLike(userId, filmStorage.getFilmById(id));
+        service.putLike(userId, id);
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
-        service.deleteLike(userId, filmStorage.getFilmById(id));
+        service.deleteLike(userId, id);
     }
 
     @GetMapping("/films/popular")
-    public List<Film> getCertainAmountOfLikedFilms() {
-        return service.getCertainAmountOfLikedFilms(10);
-    }
-
-    @GetMapping("/films/popular?count={count}")
-    public List<Film> getCertainAmountOfLikedFilms(@PathVariable Optional<Integer> count) {
+    public List<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
         if (count.isPresent()) {
+            System.out.println("---------------запрос с count = " + count.get() + "--------------------");
             return service.getCertainAmountOfLikedFilms(count.get());
         } else {
+            System.out.println("---------------запрос без count--------------------");
             return service.getCertainAmountOfLikedFilms(10);
         }
     }

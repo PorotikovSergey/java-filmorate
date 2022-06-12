@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.OwnThrowable;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -25,37 +27,62 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public void putLike(int userId, Film film) {
-        film.getLikes().add(userId);
-        userStorage.getUserById(userId).getLikedFilms().add(film.getId());
+    public void putLike(int filmId, int userId) {
+        if ((userId < 0) || (filmId < 0)) {
+            throw new NotFoundException("Отрицательного id не может быть");
+        }
+        if (userStorage.getUserById(userId) == null) {
+            throw new NotFoundException("Юзера с такими id не существует");
+        }
+        if (filmStorage.getFilmById(filmId) == null) {
+            throw new NotFoundException("Фильма с такими id не существует");
+        }
+        filmStorage.getFilmById(filmId).getLikes().add(userId);
+        userStorage.getUserById(userId).getLikedFilms().add(filmId);
     }
 
-    public void deleteLike(int userId, Film film) {
-        film.getLikes().remove(userId);
-        userStorage.getUserById(userId).getLikedFilms().remove(film.getId());
+    public void deleteLike(int filmId, int userId) {
+        if ((userId < 0) || (filmId < 0)) {
+            throw new NotFoundException("Отрицательного id не может быть");
+        }
+        if (userStorage.getUserById(userId) == null) {
+            throw new NotFoundException("Юзера с такими id не существует");
+        }
+        if (filmStorage.getFilmById(filmId) == null) {
+            throw new NotFoundException("Фильма с такими id не существует");
+        }
+        filmStorage.getFilmById(filmId).getLikes().remove(userId);
+        userStorage.getUserById(userId).getLikedFilms().remove(filmId);
     }
 
     public List<Film> getCertainAmountOfLikedFilms(int amount) {
         if (amount < 0) {
             throw new NotFoundException("Отрицательного количества не может быть");
         }
-        List<Film> resultListOfBestFilmsIds = new ArrayList<>();
+        List<Film> resultListOfBestFilms = new ArrayList<>();
         List<Film> bestFilms = new ArrayList<>(filmStorage.getAll());
         if (amount > bestFilms.size()) {
             amount = bestFilms.size();
         }
+        System.out.println("до сортировки");
+        System.out.println(bestFilms);
         bestFilms.sort(new LikesComparator());
+        System.out.println("после сортировки");
+        System.out.println(bestFilms);
         for (int i = 0; i < amount; i++) {
-            resultListOfBestFilmsIds.add(bestFilms.get(i));
+            resultListOfBestFilms.add(bestFilms.get(i));
         }
-        return resultListOfBestFilmsIds;
+        System.out.println("перед возвращением");
+        System.out.println(resultListOfBestFilms);
+        System.out.println("==========================END");
+        return resultListOfBestFilms;
     }
 
     //-----------------------Компаратор по лайкам-------------------------------
     public static class LikesComparator implements Comparator<Film> {
         @Override
         public int compare(Film film1, Film film2) {
-            return film1.getLikes().size() - film2.getLikes().size();
+            return film2.getLikes().size() - film1.getLikes().size();
         }
     }
 }

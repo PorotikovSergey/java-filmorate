@@ -4,17 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.OwnThrowable;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.*;
 
-//Создайте FilmService, который будет отвечать за операции с фильмами, —
-// добавление и удаление лайка, вывод 10 наиболее популярных фильмов по количеству лайков.
-// Пусть пока каждый пользователь может поставить лайк фильму только один раз.
 @Slf4j
 @Service
 public class FilmService {
@@ -27,7 +22,7 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public void putLike(int filmId, int userId) {
+    public void putLike(int userId, int filmId) {
         if ((userId < 0) || (filmId < 0)) {
             throw new NotFoundException("Отрицательного id не может быть");
         }
@@ -41,7 +36,7 @@ public class FilmService {
         userStorage.getUserById(userId).getLikedFilms().add(filmId);
     }
 
-    public void deleteLike(int filmId, int userId) {
+    public void deleteLike(int userId, int filmId) {
         if ((userId < 0) || (filmId < 0)) {
             throw new NotFoundException("Отрицательного id не может быть");
         }
@@ -64,21 +59,13 @@ public class FilmService {
         if (amount > bestFilms.size()) {
             amount = bestFilms.size();
         }
-        System.out.println("до сортировки");
-        System.out.println(bestFilms);
         bestFilms.sort(new LikesComparator());
-        System.out.println("после сортировки");
-        System.out.println(bestFilms);
         for (int i = 0; i < amount; i++) {
             resultListOfBestFilms.add(bestFilms.get(i));
         }
-        System.out.println("перед возвращением");
-        System.out.println(resultListOfBestFilms);
-        System.out.println("==========================END");
         return resultListOfBestFilms;
     }
 
-    //-----------------------Компаратор по лайкам-------------------------------
     public static class LikesComparator implements Comparator<Film> {
         @Override
         public int compare(Film film1, Film film2) {

@@ -65,10 +65,8 @@ public class FilmController {
     @GetMapping("/films/popular")
     public List<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
         if (count.isPresent()) {
-            System.out.println("---------------запрос с count = " + count.get() + "--------------------");
             return service.getCertainAmountOfLikedFilms(count.get());
         } else {
-            System.out.println("---------------запрос без count--------------------");
             return service.getCertainAmountOfLikedFilms(10);
         }
     }

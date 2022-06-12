@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -81,7 +80,7 @@ public class InMemoryUserStorage implements UserStorage {
     //----------------------------Валидация---------------------------------------------------------------
     private void validate(User user) {
         if (user.getId() < 0) {
-                throw new NotFoundException("Id не может быть меньше нуля");
+            throw new NotFoundException("Id не может быть меньше нуля");
         }
         if (!EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
             throw new ValidationException("Email " + user.getEmail() + " не соответсвтует требованиям.");

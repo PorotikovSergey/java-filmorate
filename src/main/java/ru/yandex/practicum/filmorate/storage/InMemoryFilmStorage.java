@@ -21,12 +21,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        film.setId(IdGenerator.generateFilmId());
         validate(film);
+        film.setId(IdGenerator.generateFilmId());
         films.put(film.getId(), film);
         log.debug("Добавлен фильм: {}", film);
         log.debug("Размер мапы с фильмами: {}", films.size());
         return film;
+
     }
 
     @Override

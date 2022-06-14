@@ -17,6 +17,7 @@ import java.util.Map;
 public class InMemoryFilmStorage implements FilmStorage {
     private static final int MAX_DESCRIPTION_LENGTH = 200;
     private static final LocalDate FIRST_CINEMA_DATE = LocalDate.of(1895, 12, 28);
+
     private final Map<Integer, Film> films = new HashMap<>();
 
     @Override
@@ -27,7 +28,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.debug("Добавлен фильм: {}", film);
         log.debug("Размер мапы с фильмами: {}", films.size());
         return film;
-
     }
 
     @Override
@@ -68,7 +68,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.get(id);
     }
 
-    //-----------------------Валидация-------------------------------------------------------------------------------
     private void validate(Film film) {
         if (film.getId() < 0) {
             throw new NotFoundException("Id фильма не может быть отрицательным. " +

@@ -18,8 +18,8 @@ import java.util.regex.Pattern;
 public class InMemoryUserStorage implements UserStorage {
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");
-    private final Map<Integer, User> users = new HashMap<>();
 
+    private final Map<Integer, User> users = new HashMap<>();
 
     @Override
     public Collection<User> getAll() {

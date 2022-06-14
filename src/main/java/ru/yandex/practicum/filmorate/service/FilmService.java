@@ -46,9 +46,13 @@ public class FilmService {
     }
 
     public void deleteLike(int userId, int filmId) {
-        if ((userId < 0) || (filmId < 0)) {
-            log.debug("Отрицательный id");
-            throw new NotFoundException("Отрицательного id не может быть");
+        if (userId < 0) {
+            log.debug("Отрицательный id {} юзера", userId);
+            throw new NotFoundException("Отрицательного id юзера не может быть");
+        }
+        if (filmId < 0) {
+            log.debug("Отрицательный id {} фильма", filmId);
+            throw new NotFoundException("Отрицательного id фильма не может быть");
         }
         if (userStorage.getUserById(userId) == null) {
             log.debug("Юзера с id {} не существует", userId);

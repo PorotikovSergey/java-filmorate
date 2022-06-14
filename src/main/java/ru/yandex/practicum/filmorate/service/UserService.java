@@ -22,11 +22,11 @@ public class UserService {
     public void setFriendship(int firstId, int secondId) {
         if (firstId < 0) {
             log.debug("Отрицательный id {} юзера", firstId);
-            throw new NotFoundException("Отрицательного id юзера не может быть");
+            throw new NotFoundException("Отрицательный id первого юзера.");
         }
         if (secondId < 0) {
             log.debug("Отрицательный id {} второго юзера", secondId);
-            throw new NotFoundException("Отрицательного id юзера не может быть");
+            throw new NotFoundException("Отрицательный id второго юзера.");
         }
         userStorage.getUserById(firstId).getFriends().add(secondId);
         log.debug("У первого юзера стало {} друзей", userStorage.getUserById(firstId).getFriends().size());
@@ -35,9 +35,13 @@ public class UserService {
     }
 
     public void breakFriendship(int firstId, int secondId) {
-        if ((firstId < 0) || (secondId < 0)) {
-            log.debug("Отрицательный id");
-            throw new NotFoundException("Отрицательного id не может быть");
+        if (firstId < 0) {
+            log.debug("Отрицательный id {} юзера", firstId);
+            throw new NotFoundException("Отрицательный id первого юзера.");
+        }
+        if (secondId < 0) {
+            log.debug("Отрицательный id {} второго юзера", secondId);
+            throw new NotFoundException("Отрицательный id второго юзера.");
         }
         userStorage.getUserById(firstId).getFriends().remove(secondId);
         log.debug("У первого юзера стало {} друзей", userStorage.getUserById(firstId).getFriends().size());

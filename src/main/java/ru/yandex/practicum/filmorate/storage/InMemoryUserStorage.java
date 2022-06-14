@@ -76,7 +76,6 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(id);
     }
 
-    //----------------------------Валидация---------------------------------------------------------------
     private void validate(User user) {
         if (user.getId() < 0) {
             throw new NotFoundException("Id не может быть меньше нуля");

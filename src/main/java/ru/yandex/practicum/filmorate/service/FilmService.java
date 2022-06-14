@@ -78,6 +78,26 @@ public class FilmService {
         return resultListOfBestFilms;
     }
 
+    public Collection<Film> getAll() {
+        return filmStorage.getAll();
+    }
+
+    public Film addFilm(Film film) {
+        return filmStorage.addFilm(film);
+    }
+
+    public Film modifyFilm(Film film) {
+        return filmStorage.modifyFilm(film);
+    }
+
+    public Film deleteFilm(Film film) {
+        return filmStorage.deleteFilm(film);
+    }
+
+    public Film getFilmById(int id) {
+        return filmStorage.getFilmById(id);
+    }
+
     public static class LikesComparator implements Comparator<Film> {
         @Override
         public int compare(Film film1, Film film2) {

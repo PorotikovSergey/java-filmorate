@@ -67,4 +67,24 @@ public class UserService {
         log.debug("Общих друзей по запросу выдано {} ", resultList.size());
         return resultList;
     }
+
+    public Collection<User> getAll() {
+        return userStorage.getAll();
+    }
+
+    public User addUser(User user) {
+        return userStorage.addUser(user);
+    }
+
+    public User modifyUser(User user) {
+        return userStorage.modifyUser(user);
+    }
+
+    public User deleteUser(User user) {
+        return userStorage.deleteUser(user);
+    }
+
+    public User getUserById(int id) {
+        return userStorage.getUserById(id);
+    }
 }

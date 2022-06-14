@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.OwnThrowable;
+import ru.yandex.practicum.filmorate.exceptions.ServiceException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
@@ -30,9 +30,9 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  //500
-    public ErrorResponse handleThrowable(final OwnThrowable e) {
+    public ErrorResponse handleThrowable(final ServiceException e) {
         return new ErrorResponse(
-                "Произошла непредвиденная ошибка."
+                e.getMessage()
         );
     }
 }

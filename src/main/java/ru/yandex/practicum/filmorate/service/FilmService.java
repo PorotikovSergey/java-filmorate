@@ -5,27 +5,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 
 @Slf4j
 @Service
 public class FilmService {
-    private final InMemoryFilmStorage filmStorage;
-    private final InMemoryUserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage storage, InMemoryUserStorage userStorage) {
-        this.filmStorage = storage;
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+        this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
 
     public void putLike(int userId, int filmId) {
-        if ((userId < 0) || (filmId < 0)) {
-            log.debug("Отрицательный id");
-            throw new NotFoundException("Отрицательного id не может быть");
+        if (userId < 0) {
+            log.debug("Отрицательный id {} юзера", userId);
+            throw new NotFoundException("Отрицательного id юзера не может быть");
+        }
+        if (filmId < 0) {
+            log.debug("Отрицательный id {} фильма", filmId);
+            throw new NotFoundException("Отрицательного id фильма не может быть");
         }
         if (userStorage.getUserById(userId) == null) {
             log.debug("Юзера с id {} не существует", userId);

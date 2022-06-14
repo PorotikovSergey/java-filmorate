@@ -5,24 +5,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 
 @Slf4j
 @Service
 public class UserService {
-    private final InMemoryUserStorage userStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
+    public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     public void setFriendship(int firstId, int secondId) {
-        if ((firstId < 0) || (secondId < 0)) {
-            log.debug("Отрицательный id");
-            throw new NotFoundException("Отрицательного id не может быть");
+        if (firstId < 0) {
+            log.debug("Отрицательный id {} юзера", firstId);
+            throw new NotFoundException("Отрицательного id юзера не может быть");
+        }
+        if (secondId < 0) {
+            log.debug("Отрицательный id {} второго юзера", secondId);
+            throw new NotFoundException("Отрицательного id юзера не может быть");
         }
         userStorage.getUserById(firstId).getFriends().add(secondId);
         log.debug("У первого юзера стало {} друзей", userStorage.getUserById(firstId).getFriends().size());
@@ -57,7 +61,7 @@ public class UserService {
     public List<User> getCommonFriends(int id, int otherId) {
         List<User> resultList = new ArrayList<>();
         if ((userStorage.getUserById(id).getFriends() == null) || (userStorage.getUserById(otherId).getFriends() == null)) {
-            return new ArrayList<>();
+            return resultList;
         }
         List<Integer> commonFriends = new ArrayList<>(userStorage.getUserById(id).getFriends());
         commonFriends.retainAll(userStorage.getUserById(otherId).getFriends());

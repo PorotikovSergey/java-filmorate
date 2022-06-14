@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
+@RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
 
@@ -24,42 +25,42 @@ public class FilmController {
         this.filmService = service;
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public Collection<Film> findAll() {
         return filmService.getAll();
     }
 
-    @PostMapping("/films")
+    @PostMapping
     public Film create(@RequestBody Film film) {
         return filmService.addFilm(film);
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film refresh(@RequestBody Film film) {
         return filmService.modifyFilm(film);
     }
 
-    @DeleteMapping("/films")
+    @DeleteMapping
     public Film remove(@RequestBody Film film) {
         return filmService.deleteFilm(film.getId());
     }
 
-    @GetMapping("/films/{id}")
+    @GetMapping("/{id}")
     public Film getFilmById(@PathVariable int id) {
         return filmService.getFilmById(id);
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
         filmService.putLike(userId, id);
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
+    @DeleteMapping("/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
         filmService.deleteLike(userId, id);
     }
 
-    @GetMapping("/films/popular")
+    @GetMapping("/popular")
     public List<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
         if (count.isPresent()) {
             return filmService.getCertainAmountOfLikedFilms(count.get());

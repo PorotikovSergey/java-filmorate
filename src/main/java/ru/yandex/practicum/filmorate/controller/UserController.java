@@ -10,6 +10,7 @@ import java.util.Collection;
 
 @Slf4j
 @RestController
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
@@ -18,48 +19,47 @@ public class UserController {
         this.userService = service;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public Collection<User> findAll() {
         return userService.getAll();
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public User create(@RequestBody User user) {
         return userService.addUser(user);
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User refresh(@RequestBody User user) {
         return userService.modifyUser(user);
     }
 
-    @DeleteMapping("/users")
+    @DeleteMapping
     public User removeUser(@RequestBody User user) {
         return userService.deleteUser(user.getId());
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable int id) {
         return userService.getUserById(id);
     }
 
-    //--------------------------Переменная пути--------------------------------------------
-    @PutMapping("/users/{id}/friends/{friendId}")
+    @PutMapping("/{id}/friends/{friendId}")
     public void setFriendship(@PathVariable int id, @PathVariable int friendId) {
         userService.setFriendship(id, friendId);
     }
 
-    @DeleteMapping("/users/{id}/friends/{friendId}")
+    @DeleteMapping("/{id}/friends/{friendId}")
     public void breakFriendship(@PathVariable int id, @PathVariable int friendId) {
         userService.breakFriendship(id, friendId);
     }
 
-    @GetMapping("/users/{id}/friends")
+    @GetMapping("/{id}/friends")
     public Collection<User> getAllFriends(@PathVariable int id) {
         return userService.getAllFriends(id);
     }
 
-    @GetMapping("/users/{id}/friends/common/{otherId}")
+    @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getCommonFriendsIds(@PathVariable int id, @PathVariable int otherId) {
         return userService.getCommonFriends(id, otherId);
     }

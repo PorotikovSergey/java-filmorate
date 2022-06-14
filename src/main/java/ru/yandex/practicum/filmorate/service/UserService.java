@@ -80,8 +80,8 @@ public class UserService {
         return userStorage.modifyUser(user);
     }
 
-    public User deleteUser(User user) {
-        return userStorage.deleteUser(user);
+    public User deleteUser(int id) {
+        return userStorage.deleteUser(id);
     }
 
     public User getUserById(int id) {

@@ -35,7 +35,7 @@ public class UserController {
 
     @DeleteMapping("/users")
     public User removeUser(@RequestBody User user) {
-        return userService.deleteUser(user);
+        return userService.deleteUser(user.getId());
     }
 
     @GetMapping("/users/{id}")

@@ -206,11 +206,11 @@ class InMemoryUserStorageTest {
         oneMoreUser.setBirthday(LocalDate.of(1997, 6, 26));
         storage.addUser(oneMoreUser);
 
-        storage.deleteUser(user);
+        storage.deleteUser(1);
         assertEquals(2, storage.getAll().size(), "Список должен состоять из 2 юзеров");
-        storage.deleteUser(newUser);
+        storage.deleteUser(2);
         assertEquals(1, storage.getAll().size(), "В списке должен остаться 1 юзер");
-        storage.deleteUser(oneMoreUser);
+        storage.deleteUser(3);
         assertEquals(0, storage.getAll().size(), "Список юзеров должен стать пустым");
     }
 }

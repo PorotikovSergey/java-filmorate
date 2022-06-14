@@ -31,12 +31,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteFilm(Film film) {
-        if (films.containsKey(film.getId())) {
-            films.remove(film.getId());
-            return film;
+    public Film deleteFilm(int id) {
+        if (films.containsKey(id)) {
+            return films.remove(id);
         } else {
-            log.debug("Фильма с Id {} не существует", film.getId());
+            log.debug("Фильма с Id {} не существует", id);
             throw new NotFoundException("Фильма с таким Id не существует");
         }
     }

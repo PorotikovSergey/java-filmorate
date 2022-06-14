@@ -41,7 +41,7 @@ public class FilmController {
 
     @DeleteMapping("/films")
     public Film remove(@RequestBody Film film) {
-        return filmService.deleteFilm(film);
+        return filmService.deleteFilm(film.getId());
     }
 
     @GetMapping("/films/{id}")

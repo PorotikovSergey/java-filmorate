@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.IdGenerator;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
@@ -11,6 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryFilmStorageTest {
     private final InMemoryFilmStorage storage = new InMemoryFilmStorage();
+
+    @BeforeEach
+    void start() {
+        IdGenerator.setFilmId(0);
+    }
 
     @Test
     void addFilmRight() throws ValidationException {
@@ -158,11 +165,13 @@ class InMemoryFilmStorageTest {
         oneMoreFilm.setDuration(1000);
         storage.addFilm(oneMoreFilm);
 
-        storage.deleteFilm(film);
+        System.out.println();
+
+        storage.deleteFilm(1);
         assertEquals(2, storage.getAll().size(), "Список должен состоять из 2 фильмов");
-        storage.deleteFilm(newFilm);
+        storage.deleteFilm(2);
         assertEquals(1, storage.getAll().size(), "В списке должен остаться 1 фильм");
-        storage.deleteFilm(oneMoreFilm);
+        storage.deleteFilm(3);
         assertEquals(0, storage.getAll().size(), "Список фильмов должен стать пустым");
     }
 }

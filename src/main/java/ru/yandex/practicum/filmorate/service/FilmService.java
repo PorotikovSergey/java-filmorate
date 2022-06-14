@@ -90,8 +90,8 @@ public class FilmService {
         return filmStorage.modifyFilm(film);
     }
 
-    public Film deleteFilm(Film film) {
-        return filmStorage.deleteFilm(film);
+    public Film deleteFilm(int id) {
+        return filmStorage.deleteFilm(id);
     }
 
     public Film getFilmById(int id) {

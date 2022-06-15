@@ -5,12 +5,10 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.IdGenerator;
-
 import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class UserStorageTest <T extends UserStorage> {
+public abstract class UserStorageTest<T extends UserStorage> {
     private final T userStorage;
 
     public UserStorageTest(UserStorage userStorage) {

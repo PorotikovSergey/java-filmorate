@@ -1,77 +1,70 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.IdGenerator;
-
-import java.time.LocalDate;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
+@RequestMapping("/films")
 public class FilmController {
-    private static final int MAX_DESCRIPTION_LENGTH = 200;
-    private static final LocalDate FIRST_CINEMA_DATE = LocalDate.of(1895, 12, 28);
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final FilmService filmService;
 
-    @GetMapping("/films")
+    @Autowired
+    public FilmController(FilmService service) {
+        this.filmService = service;
+    }
+
+    @GetMapping
     public Collection<Film> findAll() {
-        log.debug("Текущее количество фильмов: {}", films.size());
-        return films.values();
+        return filmService.getAll();
     }
 
-    @PostMapping("/films")
-    public Film create(@RequestBody Film film) throws ValidationException {
-        film.setId(IdGenerator.generateFilmId());
-        validate(film);
-        films.put(film.getId(), film);
-        log.debug("Добавлен фильм: {}", film);
-        log.debug("Размер мапы с фильмами: {}", films.size());
-        return film;
+    @PostMapping
+    public Film create(@RequestBody Film film) {
+        return filmService.addFilm(film);
     }
 
-    @PutMapping("/films")
-    public Film refresh(@RequestBody Film film) throws ValidationException {
-        validate(film);
-        if (!films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.debug("Обновлён(добавлен) фильм: {}", film);
-            log.debug("Размер мапы с фильмами-{} после обновления(добавления) фильма: {}", films.size(), film);
+    @PutMapping
+    public Film refresh(@RequestBody Film film) {
+        return filmService.modifyFilm(film);
+    }
+
+    @DeleteMapping("/{id}")
+    public Film remove(@PathVariable int id) {
+        return filmService.deleteFilm(id);
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        return filmService.getFilmById(id);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
+        filmService.putLike(userId, id);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
+        filmService.deleteLike(userId, id);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
+        if (count.isPresent()) {
+            return filmService.getCertainAmountOfLikedFilms(count.get());
         } else {
-            films.replace(film.getId(), film);
-            log.debug("Обновлён фильм: {}", film);
-            log.debug("Размер мапы с фильмами-{} после обновления фильма: {}", films.size(), film);
-        }
-        return film;
-    }
-
-    //-------------------Проверка фильма на соотвтетствие-----------------------------------------
-    private void validate(Film film) throws ValidationException {
-        if (film.getId() < 0) {
-            throw new ValidationException("Id фильма не может быть отрицательным. " +
-                    "Вы пытаетесь задать id: " + film.getId());
-        }
-        if (film.getName().isBlank()) {
-            throw new ValidationException("Невозможно запостить фильм c пустым названием.");
-        }
-        if (film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-            throw new ValidationException("Невозможно запостить фильм  с описанием больше "
-                    + MAX_DESCRIPTION_LENGTH + " символов");
-        }
-        if (film.getReleaseDate().isBefore(FIRST_CINEMA_DATE)) {
-            throw new ValidationException("Невозможно запостить фильм с датой выпуска раньше " + FIRST_CINEMA_DATE);
-        }
-        if (film.getDuration() < 0) {
-            throw new ValidationException("Невозможно запостить фильм с отрицательной длительностью: "
-                    + film.getDuration());
+            return filmService.getCertainAmountOfLikedFilms(10);
         }
     }
 }

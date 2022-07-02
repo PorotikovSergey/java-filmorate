@@ -1,4 +1,4 @@
 # java-filmorate
 Template repository for Filmorate project.
 
-![Схема БД приложения filmorate] (QuickDBD-Filmorate (5).png)
+![Схема БД приложения filmorate] (https://github.com/PorotikovSergey/java-filmorate/blob/add-database/QuickDBD-Filmorate%20(5).png)

@@ -1,62 +1,56 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
-import java.util.Optional;
+
 
 @Component
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
+    public Film getFilmById(int id) {
+        return jdbcTemplate.query("select * from films where film_id = ?", new Object[]{id}, new FilmMapper())
+                .stream().findAny().orElse(null);
+    }
+
+    @Override
     public Collection<Film> getAll() {
-        return null;
+        return jdbcTemplate.query("SELECT * FROM films", new FilmMapper());
     }
 
     @Override
     public Film addFilm(Film film) {
-        return null;
+        jdbcTemplate.update("INSERT INTO users (FILM_NAME, FILM_DESCRIPTION, " +
+                        "FILM_DURATION, FILM_RELEASEDATE, FILM_RATING) " +
+                        "VALUES (?,?,?,?,?)", film.getName(), film.getDescription(),
+                film.getDuration(), film.getReleaseDate(), film.getRating());
+        return film;
     }
 
     @Override
-    public Film deleteFilm(int id) {
-        return null;
+    public Film modifyFilm(int id, Film film) {
+        jdbcTemplate.update("UPDATE films SET film_name=?, film_description=?, " +
+                        "film_duration=?, film_releaseDate=?, film_rating=? WHERE film_id=?",
+                film.getName(), film.getDescription(), film.getDuration(),
+                film.getReleaseDate(), film.getRating(), id);
+        return film;
     }
 
     @Override
-    public Film modifyFilm(Film film) {
-        return null;
-    }
-
-    @Override
-    public Optional<Film> getFilmById(int id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films where id = ?", id);
-
-        if(filmRows.next()) {
-            Film film = new Film(
-                    filmRows.getInt("film_id"),
-                    filmRows.getString("film_name"),
-                    filmRows.getString("film_description"),
-                    filmRows.getDate("film_date"),
-                    filmRows.getLong("film_duration"));
-
-            log.info("Найден пользователь: {} {}", film.getId(), film.getName());
-
-            return Optional.of(film);
-        } else {
-            log.info("Фильм с идентификатором {} не найден.", id);
-            return Optional.empty();
-        }
+    public void deleteFilm(int id) {
+        jdbcTemplate.update("DELETE FROM films WHERE film_id = ?", id);
     }
 }

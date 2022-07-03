@@ -1,14 +1,6 @@
-create table IF NOT EXISTS RATING
-(
-    RATING_ID   int auto_increment,
-    RATING_NAME varchar(5),
-    constraint RATING_PK
-        primary key (rating_id)
-);
-
 create table IF NOT EXISTS GENRE
 (
-    GENRE_ID   INTEGER auto_increment,
+    GENRE_ID   INTEGER ,
     GENRE_NAME CHARACTER VARYING(15) not null,
     constraint GENRE_PK
         primary key (GENRE_ID)
@@ -21,9 +13,7 @@ create table IF NOT EXISTS FILMS
     FILM_DESCRIPTION CHARACTER VARYING(500),
     FILM_DURATION    BIGINT                not null,
     FILM_RELEASEDATE DATE,
-    FILM_RATING INTEGER not null,
-    constraint FILM_RATING_PK
-        foreign key (FILM_RATING) references RATING(RATING_ID),
+    FILM_RATING CHARACTER VARYING(5),
     constraint FILMS_PK
         primary key (FILM_ID)
 );

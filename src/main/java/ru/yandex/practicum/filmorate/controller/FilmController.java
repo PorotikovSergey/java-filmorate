@@ -24,47 +24,47 @@ public class FilmController {
         this.filmService = service;
     }
 
-    @GetMapping
-    public Collection<Film> findAll() {
-        return filmService.getAll();
-    }
-
-    @PostMapping
-    public Film create(@RequestBody Film film) {
-        return filmService.addFilm(film);
-    }
-
-    @PutMapping
-    public Film refresh(@RequestBody Film film) {
-        return filmService.modifyFilm(film);
-    }
-
-    @DeleteMapping("/{id}")
-    public Film remove(@PathVariable int id) {
-        return filmService.deleteFilm(id);
-    }
-
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable int id) {
         return filmService.getFilmById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}")
-    public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
-        filmService.putLike(userId, id);
-    }
-
-    @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
-        filmService.deleteLike(userId, id);
-    }
-
-    @GetMapping("/popular")
-    public List<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
-        if (count.isPresent()) {
-            return filmService.getCertainAmountOfLikedFilms(count.get());
-        } else {
-            return filmService.getCertainAmountOfLikedFilms(10);
-        }
-    }
+//    @GetMapping
+//    public Collection<Film> findAll() {
+//        return filmService.getAll();
+//    }
+//
+//    @PostMapping
+//    public Film create(@RequestBody Film film) {
+//        return filmService.addFilm(film);
+//    }
+//
+//    @PutMapping
+//    public Film refresh(@RequestBody Film film) {
+//        return filmService.modifyFilm(film);
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public Film remove(@PathVariable int id) {
+//        return filmService.deleteFilm(id);
+//    }
+//
+//    @PutMapping("/{id}/like/{userId}")
+//    public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
+//        filmService.putLike(userId, id);
+//    }
+//
+//    @DeleteMapping("/{id}/like/{userId}")
+//    public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
+//        filmService.deleteLike(userId, id);
+//    }
+//
+//    @GetMapping("/popular")
+//    public List<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
+//        if (count.isPresent()) {
+//            return filmService.getCertainAmountOfLikedFilms(count.get());
+//        } else {
+//            return filmService.getCertainAmountOfLikedFilms(10);
+//        }
+//    }
 }

@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
 
 @Data
 public class User {
@@ -11,7 +9,13 @@ public class User {
     private String email;
     private String login;
     private String name;
-    private LocalDate birthday;
-    private Set<Integer> friends = new HashSet<>();
-    private Set<Integer> likedFilms = new HashSet<>();
+    private Date birthday;
+
+    public User (int id, String email, String login, String name, Date birthday) {
+        this.id=id;
+        this.email=email;
+        this.login=login;
+        this.name=name;
+        this.birthday=birthday;
+    }
 }

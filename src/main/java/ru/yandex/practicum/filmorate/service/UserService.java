@@ -22,27 +22,30 @@ public class UserService {
         return userStorage.getUserById(id);
     }
 
-//    public void setFriendship(int firstId, int secondId) {
-//    }
-//
-//    public void breakFriendship(int firstId, int secondId) {
-//    }
-//
+    public Collection<User> getAll() {
+        return userStorage.getAll();
+    }
+
+    public User addUser(User user) {
+        return userStorage.addUser(user);
+    }
+
+    public User modifyUser(User user) {
+        return userStorage.modifyUser(user);
+    }
+
 //    public List<User> getAllFriends(int id) {
+//        return (List<User>) userStorage.getAllConfirmedFriends(id);
 //    }
-//
-//    public List<User> getCommonFriends(int id, int otherId) {
-//    }
-//
-//    public Collection<User> getAll() {
-//    }
-//
-//    public User addUser(User user) {
-//    }
-//
-//    public User modifyUser(User user) {
-//    }
-//
-//    public User deleteUser(int id) {
-//    }
+
+    public void setFriendship(int firstId, int secondId) {
+    }
+
+    public void breakFriendship(int firstId, int secondId) {
+    }
+
+
+    public void deleteUser(int id) {
+        userStorage.deleteUser(id);
+    }
 }

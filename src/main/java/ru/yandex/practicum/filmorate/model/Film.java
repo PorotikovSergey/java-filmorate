@@ -6,15 +6,14 @@ import lombok.Data;
 
 @Data
 public class Film {
-    private int id;
+    private int id=1;
     private String name;
     private String description;
     private Date releaseDate;
-    private long duration;
-    private Rating rating;
+    private int duration;
+    private String rating;
 
-    public Film(int id, String name, String description, Date releaseDate, long duration, Rating rating) {
-        this.id = id;
+    public Film(String name, String description, Date releaseDate, int duration, String rating) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

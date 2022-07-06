@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import java.util.Collection;
+
 @Slf4j
 @RestController
 @RequestMapping("/users")
@@ -22,35 +24,35 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-//    @GetMapping
-//    public Collection<User> findAll() {
-//        return userService.getAll();
-//    }
-//
-//    @PostMapping
-//    public User create(@RequestBody User user) {
-//        return userService.addUser(user);
-//    }
-//
-//    @PutMapping
-//    public User refresh(@RequestBody User user) {
-//        return userService.modifyUser(user);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public User removeUser(@PathVariable int id) {
-//        return userService.deleteUser(id);
-//    }
-//
-//    @PutMapping("/{id}/friends/{friendId}")
-//    public void setFriendship(@PathVariable int id, @PathVariable int friendId) {
-//        userService.setFriendship(id, friendId);
-//    }
-//
-//    @DeleteMapping("/{id}/friends/{friendId}")
-//    public void breakFriendship(@PathVariable int id, @PathVariable int friendId) {
-//        userService.breakFriendship(id, friendId);
-//    }
+    @GetMapping
+    public Collection<User> findAll() {
+        return userService.getAll();
+    }
+
+    @PostMapping
+    public User create(@RequestBody User user) {
+        return userService.addUser(user);
+    }
+
+    @PutMapping
+    public User refresh(@RequestBody User user) {
+        return userService.modifyUser(user);
+    }
+
+    @DeleteMapping("/{id}")
+    public void removeUser(@PathVariable int id) {
+        userService.deleteUser(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void setFriendship(@PathVariable int id, @PathVariable int friendId) {
+        userService.setFriendship(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void breakFriendship(@PathVariable int id, @PathVariable int friendId) {
+        userService.breakFriendship(id, friendId);
+    }
 //
 //    @GetMapping("/{id}/friends")
 //    public Collection<User> getAllFriends(@PathVariable int id) {

@@ -3,18 +3,23 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 @Component
 @Slf4j
@@ -26,6 +31,23 @@ public class FilmDbStorage implements FilmStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+//    @Override
+//    public Film addFilm(Film film) {
+//        validate(film);
+//        String sqlQuery = "INSERT INTO FILMS " +
+//                "(FILM_NAME, FILM_DESCRIPTION, FILM_RELEASEDATE, FILM_DURATION, FILM_RATING) " +
+//                "VALUES (?,?,?,?,?)";
+//
+//        jdbcTemplate.update(sqlQuery,
+//                film.getName(),
+//                film.getDescription(),
+//                film.getReleaseDate(),
+//                film.getDuration(),
+//                film.getRating());
+//
+//        return film;
+//    }
+
     @Override
     public Film addFilm(Film film) {
         validate(film);
@@ -33,13 +55,22 @@ public class FilmDbStorage implements FilmStorage {
                 "(FILM_NAME, FILM_DESCRIPTION, FILM_RELEASEDATE, FILM_DURATION, FILM_RATING) " +
                 "VALUES (?,?,?,?,?)";
 
-        jdbcTemplate.update(sqlQuery,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getRating());
-
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"FILM_ID"});
+            stmt.setString(1, film.getName());
+            stmt.setString(2, film.getDescription());
+            final LocalDate releaseDate = film.getReleaseDate();
+            if (releaseDate == null) {
+                stmt.setNull(3, Types.DATE);
+            } else {
+                stmt.setDate(3, Date.valueOf(releaseDate));
+            }
+            stmt.setInt(4, film.getDuration());
+            stmt.setInt(5, film.getRating());
+            return stmt;
+        }, keyHolder);
+        film.setId(keyHolder.getKey().intValue());
         return film;
     }
 

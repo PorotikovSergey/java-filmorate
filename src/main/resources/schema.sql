@@ -1,11 +1,18 @@
--- create table IF NOT EXISTS GENRE
--- (
---     GENRE_ID   INTEGER NOT NULL ,
---     GENRE_NAME CHARACTER VARYING(15),
---     constraint GENRE_PK
---         primary key (GENRE_ID)
--- );
+create table IF NOT EXISTS GENRE
+(
+    GENRE_ID   INTEGER NOT NULL ,
+    GENRE_NAME CHARACTER VARYING(15),
+    constraint GENRE_PK
+        primary key (GENRE_ID)
+);
 
+create table IF NOT EXISTS RATING
+(
+    RATING_ID   int        not null,
+    RATING_NAME varchar(5) not null,
+    constraint RATING_PK
+        primary key (RATING_ID)
+);
 
 create table IF NOT EXISTS FILMS
 (
@@ -14,9 +21,11 @@ create table IF NOT EXISTS FILMS
     FILM_DESCRIPTION CHARACTER VARYING(500),
     FILM_DURATION    INTEGER,
     FILM_RELEASEDATE DATE,
-    FILM_RATING CHARACTER VARYING(5),
+    FILM_RATING INTEGER,
     constraint FILMS_PK
-        primary key (FILM_ID)
+        primary key (FILM_ID),
+    constraint FILM_RATING_RATING_ID_FK
+        foreign key (FILM_RATING) references GENRE(GENRE_ID)
 );
 
 

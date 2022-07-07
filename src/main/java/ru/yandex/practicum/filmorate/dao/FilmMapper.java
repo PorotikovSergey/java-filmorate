@@ -14,6 +14,6 @@ public class FilmMapper implements RowMapper<Film> {
                 rs.getString("FILM_DESCRIPTION"),
                 rs.getDate("FILM_RELEASEDATE").toLocalDate(),
                 rs.getInt("FILM_DURATION"),
-                rs.getString("FILM_RATING"));
+                rs.getInt("FILM_RATING"));
     }
 }

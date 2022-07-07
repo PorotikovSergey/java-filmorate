@@ -53,12 +53,12 @@ public class UserController {
     public void breakFriendship(@PathVariable int id, @PathVariable int friendId) {
         userService.breakFriendship(id, friendId);
     }
-//
-//    @GetMapping("/{id}/friends")
-//    public Collection<User> getAllFriends(@PathVariable int id) {
-//        return userService.getAllFriends(id);
-//    }
-//
+
+    @GetMapping("/{id}/friends")
+    public Collection<User> getAllFriends(@PathVariable int id) {
+        return userService.getAllFriends(id);
+    }
+
 //    @GetMapping("/{id}/friends/common/{otherId}")
 //    public Collection<User> getCommonFriendsIds(@PathVariable int id, @PathVariable int otherId) {
 //        return userService.getCommonFriends(id, otherId);

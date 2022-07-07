@@ -1,2 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;public interface UtilStorage {
+package ru.yandex.practicum.filmorate.storage;
+
+public interface UtilStorage {
 }

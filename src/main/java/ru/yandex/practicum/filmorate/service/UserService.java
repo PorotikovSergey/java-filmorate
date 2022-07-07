@@ -34,11 +34,12 @@ public class UserService {
         return userStorage.modifyUser(user);
     }
 
-//    public List<User> getAllFriends(int id) {
-//        return (List<User>) userStorage.getAllConfirmedFriends(id);
-//    }
+    public List<User> getAllFriends(int id) {
+        return (List<User>) userStorage.getAllConfirmedFriends(id);
+    }
 
     public void setFriendship(int firstId, int secondId) {
+        userStorage.setFriendship(firstId, secondId);
     }
 
     public void breakFriendship(int firstId, int secondId) {

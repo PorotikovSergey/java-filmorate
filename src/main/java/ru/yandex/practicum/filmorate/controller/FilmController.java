@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +42,12 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@RequestBody Film film) {
+    public Film create(@RequestBody Film film) throws ParseException {
         return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Film refresh(@RequestBody Film film) {
+    public Film refresh(@RequestBody Film film) throws ParseException {
         return filmService.modifyFilm(film);
     }
 

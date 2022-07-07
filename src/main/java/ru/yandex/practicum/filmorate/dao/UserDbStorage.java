@@ -2,11 +2,14 @@ package ru.yandex.practicum.filmorate.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -15,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 @Component
 @Repository
@@ -29,6 +33,7 @@ public class UserDbStorage implements UserStorage {
 
    @Override
     public User addUser(User user) {
+        validate(user);
         String sqlQuery = "INSERT INTO USERS (USER_NAME, USER_LOGIN, USER_EMAIL, USER_BIRTHDAY)" +
                 "VALUES (?,?,?,?)";
 
@@ -78,6 +83,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User modifyUser(User user) {
+        if(getUserById(user.getId())==null) {
+            throw new NotFoundException("Юзера с таким id не существует");
+        }
+        validate(user);
         String sqlQuery = "UPDATE USERS SET USER_ID = ? , USER_NAME = ?, USER_LOGIN = ?," +
                 " USER_EMAIL = ?, USER_BIRTHDAY = ? WHERE USER_ID = ?";
 
@@ -97,4 +106,23 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query("SELECT * FROM users", new UserMapper());
     }
 
+    //---------------------Проверка юзера на соответствие-------------------------------------
+    private void validate(User user) throws ValidationException {
+        final Pattern EMAIL_PATTERN = Pattern.compile(
+                "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");
+
+        if (user.getId() < 0) {
+            throw new ValidationException("Id юзера не может быть отрицательным. " +
+                    "Вы пытаетесь задать id: " + user.getId());
+        }
+        if (!EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
+            throw new ValidationException("Email " + user.getEmail() + " не соответсвтует требованиям.");
+        }
+        if ((user.getLogin().isBlank()) || user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин " + user.getLogin() + " не соответствет требованиям.");
+        }
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Указанная дата рождения " + user.getBirthday() + " находится в будущем.");
+        }
+    }
 }

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.text.ParseException;
 import java.util.Collection;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public Film addFilm(Film film) {
+    public Film addFilm(Film film) throws ParseException {
         return filmStorage.addFilm(film);
     }
 
@@ -41,7 +42,7 @@ public class FilmService {
     public void putLike(int userId, int filmId) {
     }
 
-    public Film modifyFilm(Film film){
+    public Film modifyFilm(Film film) throws ParseException {
         return filmStorage.modifyFilm(film);
     }
 

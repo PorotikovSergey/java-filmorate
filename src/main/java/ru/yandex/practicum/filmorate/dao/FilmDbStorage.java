@@ -4,11 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 
 @Component
 @Slf4j
@@ -22,6 +28,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
+        validate(film);
         String sqlQuery = "INSERT INTO FILMS " +
                 "(FILM_NAME, FILM_DESCRIPTION, FILM_RELEASEDATE, FILM_DURATION, FILM_RATING) " +
                 "VALUES (?,?,?,?,?)";
@@ -45,6 +52,10 @@ public class FilmDbStorage implements FilmStorage {
     }
     @Override
     public Film modifyFilm(Film film) {
+        if(getFilmById(film.getId())==null) {
+            throw new NotFoundException("Фильма с таким id не существует");
+        }
+        validate(film);
         String sqlQuery = "UPDATE FILMS SET FILM_NAME = ?, FILM_DESCRIPTION = ?," +
                 " FILM_RELEASEDATE = ?, FILM_DURATION = ?, FILM_RATING = ? WHERE FILM_ID = ?";
 
@@ -79,5 +90,33 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void deleteLike(int userId, int filmId) {
         jdbcTemplate.update("DELETE FROM LIKED_FILMS WHERE USER_ID=? AND FILM_ID=?", userId, filmId);
+    }
+
+    //-------------------Проверка фильма на соотвтетствие-----------------------------------------
+    private void validate(Film film) throws ValidationException{
+
+        final int MAX_DESCRIPTION_LENGTH = 200;
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-d");
+        final LocalDate FIRST_CINEMA_DATE = LocalDate.of(1895, 12, 28);
+
+
+        if (film.getId() < 0) {
+            throw new ValidationException("Id фильма не может быть отрицательным. " +
+                    "Вы пытаетесь задать id: " + film.getId());
+        }
+        if (film.getName().isBlank()) {
+            throw new ValidationException("Невозможно запостить фильм c пустым названием.");
+        }
+        if (film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
+            throw new ValidationException("Невозможно запостить фильм  с описанием больше "
+                    + MAX_DESCRIPTION_LENGTH + " символов");
+        }
+        if (film.getReleaseDate().isBefore(FIRST_CINEMA_DATE)) {
+            throw new ValidationException("Невозможно запостить фильм с датой выпуска раньше " + FIRST_CINEMA_DATE);
+        }
+        if (film.getDuration() < 0) {
+            throw new ValidationException("Невозможно запостить фильм с отрицательной длительностью: "
+                    + film.getDuration());
+        }
     }
 }

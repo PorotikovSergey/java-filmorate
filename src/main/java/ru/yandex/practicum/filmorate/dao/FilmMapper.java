@@ -12,7 +12,7 @@ public class FilmMapper implements RowMapper<Film> {
         return new Film(
                 rs.getString("FILM_NAME"),
                 rs.getString("FILM_DESCRIPTION"),
-                rs.getDate("FILM_RELEASEDATE"),
+                rs.getDate("FILM_RELEASEDATE").toLocalDate(),
                 rs.getInt("FILM_DURATION"),
                 rs.getString("FILM_RATING"));
     }

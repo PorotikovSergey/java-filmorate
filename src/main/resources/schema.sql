@@ -1,10 +1,11 @@
-create table IF NOT EXISTS GENRE
-(
-    GENRE_ID   INTEGER ,
-    GENRE_NAME CHARACTER VARYING(15),
-    constraint GENRE_PK
-        primary key (GENRE_ID)
-);
+-- create table IF NOT EXISTS GENRE
+-- (
+--     GENRE_ID   INTEGER NOT NULL ,
+--     GENRE_NAME CHARACTER VARYING(15),
+--     constraint GENRE_PK
+--         primary key (GENRE_ID)
+-- );
+
 
 create table IF NOT EXISTS FILMS
 (
@@ -21,8 +22,8 @@ create table IF NOT EXISTS FILMS
 
 create table IF NOT EXISTS FILM_GENRE_ACCORDING
 (
-    FILM_ID  INTEGER not null,
-    GENRE_ID INTEGER not null,
+    FILM_ID  INTEGER ,
+    GENRE_ID INTEGER ,
     constraint FILM_ID_GENRE
         foreign key (FILM_ID) references FILMS,
     constraint GENRE_ID
@@ -42,8 +43,8 @@ create table IF NOT EXISTS USERS
 
 create table IF NOT EXISTS FRIENDSHIP
 (
-    USER_ID   INTEGER               not null,
-    FRIEND_ID INTEGER               not null,
+    USER_ID   INTEGER               ,
+    FRIEND_ID INTEGER               ,
     STATUS    BOOLEAN not null,
     constraint FRIEND_ID
         foreign key (FRIEND_ID) references USERS,
@@ -53,8 +54,8 @@ create table IF NOT EXISTS FRIENDSHIP
 
 create table IF NOT EXISTS LIKED_FILMS
 (
-    USER_ID INTEGER not null,
-    FILM_ID INTEGER not null,
+    USER_ID INTEGER ,
+    FILM_ID INTEGER ,
     constraint FILM_ID_LIKES
         foreign key (FILM_ID) references FILMS,
     constraint USER_ID_LIKES
@@ -63,7 +64,6 @@ create table IF NOT EXISTS LIKED_FILMS
 
 DELETE FROM USERS WHERE USER_ID<1000;
 DELETE FROM FILMS WHERE FILMS.FILM_ID<1000;
-DELETE FROM GENRE WHERE GENRE.GENRE_ID<1000;
 DELETE FROM LIKED_FILMS WHERE USER_ID<1000;
 DELETE FROM FILM_GENRE_ACCORDING WHERE FILM_GENRE_ACCORDING.FILM_ID<1000;
 DELETE FROM FRIENDSHIP WHERE USER_ID<1000;

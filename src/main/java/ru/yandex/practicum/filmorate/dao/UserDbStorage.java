@@ -31,21 +31,6 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-//    @Override
-//    public User addUser(User user) {
-//        validate(user);
-//        String sqlQuery = "INSERT INTO USERS (USER_NAME, USER_LOGIN, USER_EMAIL, USER_BIRTHDAY)" +
-//                "VALUES (?,?,?,?)";
-//
-//        jdbcTemplate.update(sqlQuery,
-//                user.getName(),
-//                user.getLogin(),
-//                user.getEmail(),
-//                user.getBirthday());
-//
-//
-//        return user;
-//    }
     @Override
     public User addUser(User user) {
         validate(user);
@@ -66,7 +51,6 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
         user.setId(keyHolder.getKey().intValue());
-        System.out.println(user);
         return user;
     }
 
@@ -86,8 +70,6 @@ public class UserDbStorage implements UserStorage {
         if (user == null) {
             throw new NotFoundException("Юзера с таким id не существует");
         } else {
-            user.setId(id);
-            System.out.println(user);
             return user;
         }
     }
@@ -98,11 +80,10 @@ public class UserDbStorage implements UserStorage {
             throw new NotFoundException("Юзера с таким id не существует");
         }
         validate(user);
-        String sqlQuery = "UPDATE USERS SET /*USER_ID = ? ,*/ USER_NAME = ?, USER_LOGIN = ?," +
+        String sqlQuery = "UPDATE USERS SET  USER_NAME = ?, USER_LOGIN = ?," +
                 " USER_EMAIL = ?, USER_BIRTHDAY = ? WHERE USER_ID = ?";
 
         jdbcTemplate.update(sqlQuery,
-                /*user.getId(),*/
                 user.getName(),
                 user.getLogin(),
                 user.getEmail(),
@@ -118,10 +99,23 @@ public class UserDbStorage implements UserStorage {
             throw new NotFoundException("Юзера с таким id не существует");
         }
         String sql = "SELECT * FROM USERS WHERE USER_ID IN (SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = ?)";
-        System.out.println("===================================================================");
-        System.out.println(jdbcTemplate.query(sql, new Object[]{id}, new UserMapper()));
-        System.out.println("===================================================================");
         return jdbcTemplate.query(sql, new Object[]{id}, new UserMapper());
+    }
+
+    @Override
+    public List<User> getCommonFriends(int id, int otherId) {
+        if (getUserById(id) == null) {
+            throw new NotFoundException("Юзера n1 с таким id не существует");
+        }
+        if (getUserById(otherId) == null) {
+            throw new NotFoundException("Юзера n2 с таким id не существует");
+        }
+
+        String sql = "SELECT * FROM USERS WHERE USER_ID IN " +
+                "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = 1 and FRIEND_ID IN " +
+                "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = 2))";
+
+        return jdbcTemplate.query(sql, new UserMapper());
     }
 
     @Override
@@ -139,12 +133,12 @@ public class UserDbStorage implements UserStorage {
                 firstId,
                 secondId,
                 true);
+    }
 
-//        jdbcTemplate.update(sqlQuery,
-//                secondId,
-//                firstId,
-//                true);
-
+    @Override
+    public void breakFriendship(int firstId, int secondId) {
+        String sqlQuery = "DELETE FROM FRIENDSHIP WHERE USER_ID = ? AND FRIEND_ID = ?";
+        jdbcTemplate.update(sqlQuery, firstId, secondId);
     }
 
     @Override

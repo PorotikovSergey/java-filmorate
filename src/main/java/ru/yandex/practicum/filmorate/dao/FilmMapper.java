@@ -9,11 +9,13 @@ import java.sql.SQLException;
 public class FilmMapper implements RowMapper<Film> {
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Film(
+        Film film = new Film(
                 rs.getString("FILM_NAME"),
                 rs.getString("FILM_DESCRIPTION"),
                 rs.getDate("FILM_RELEASEDATE").toLocalDate(),
                 rs.getInt("FILM_DURATION"),
                 rs.getInt("FILM_RATING"));
+        film.setId(rs.getInt("FILM_ID"));
+        return film;
     }
 }

@@ -17,5 +17,9 @@ public interface UserStorage {
 
     List<User> getAllConfirmedFriends(int id);
 
+    List<User> getCommonFriends(int id, int otherId);
+
     void setFriendship(int firstId, int secondId);
+
+    void breakFriendship(int firstId, int secondId);
 }

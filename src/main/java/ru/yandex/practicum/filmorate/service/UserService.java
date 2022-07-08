@@ -43,10 +43,15 @@ public class UserService {
     }
 
     public void breakFriendship(int firstId, int secondId) {
+        userStorage.breakFriendship(firstId, secondId);
     }
 
 
     public void deleteUser(int id) {
         userStorage.deleteUser(id);
+    }
+
+    public Collection<User> getCommonFriends(int id, int otherId) {
+        return userStorage.getCommonFriends(id, otherId);
     }
 }

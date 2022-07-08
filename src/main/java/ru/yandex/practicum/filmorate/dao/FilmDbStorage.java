@@ -127,7 +127,6 @@ public class FilmDbStorage implements FilmStorage {
     private void validate(Film film) throws ValidationException{
 
         final int MAX_DESCRIPTION_LENGTH = 200;
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-d");
         final LocalDate FIRST_CINEMA_DATE = LocalDate.of(1895, 12, 28);
 
 

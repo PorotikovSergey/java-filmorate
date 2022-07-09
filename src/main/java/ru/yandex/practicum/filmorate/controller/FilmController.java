@@ -60,4 +60,9 @@ public class FilmController {
     public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
         filmService.deleteLike(userId, id);
     }
+
+    @GetMapping("/popular")
+    public Collection<Film> getPopular() {
+        return filmService.getPopular();
+    }
 }

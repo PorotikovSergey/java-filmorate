@@ -62,7 +62,13 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getPopular() {
-        return filmService.getPopular();
+    public Collection<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
+        if (count.isPresent()) {
+            System.out.println("найти популярных "+count.get());
+            return filmService.getPopular(count.get());
+        } else {
+            System.out.println("найти популярных");
+            return filmService.getAllPopular();
+        }
     }
 }

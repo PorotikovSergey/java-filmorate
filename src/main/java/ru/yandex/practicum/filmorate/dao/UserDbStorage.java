@@ -112,10 +112,10 @@ public class UserDbStorage implements UserStorage {
         }
 
         String sql = "SELECT * FROM USERS WHERE USER_ID IN " +
-                "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = 1 and FRIEND_ID IN " +
-                "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = 2))";
+                "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = ? and FRIEND_ID IN " +
+                "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = ?))";
 
-        return jdbcTemplate.query(sql, new UserMapper());
+        return jdbcTemplate.query(sql, new Object[]{id, otherId}, new UserMapper());
     }
 
     @Override

@@ -40,6 +40,7 @@ public class FilmService {
     }
 
     public void putLike(int userId, int filmId) {
+        filmStorage.putLike(userId, filmId);
     }
 
     public Film modifyFilm(Film film) throws ParseException {
@@ -50,7 +51,11 @@ public class FilmService {
         filmStorage.deleteLike(userId, filmId);
     }
 
-    public Collection<Film> getPopular() {
-        return filmStorage.getPopular();
+    public Collection<Film> getPopular(int count) {
+        return filmStorage.getPopular(count);
+    }
+
+    public Collection<Film> getAllPopular() {
+        return filmStorage.getAllPopular();
     }
 }

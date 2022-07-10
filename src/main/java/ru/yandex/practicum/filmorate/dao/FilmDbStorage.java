@@ -18,9 +18,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -35,6 +33,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         validate(film);
+        ;
         String addGenre = "INSERT INTO FILM_GENRE_ACCORDING (FILM_ID, GENRE_ID) VALUES (?, ?)";
         String addMPA = "INSERT INTO FILM_MPA_ACCORDING (FILM_ID, MPA_ID) VALUES (?, ?)";
         String sqlQuery = "INSERT INTO FILMS " +
@@ -76,13 +75,13 @@ public class FilmDbStorage implements FilmStorage {
             throw new NotFoundException("Фильма с таким id не существует");
         }
         film.setMpa(getMPA(film.getId()));
-        film.setGenres((ArrayList<Genre>) getGenre(film.getId()));
+        film.setGenres((Set<Genre>) getGenre(film.getId()));
         return film;
     }
 
     public Mpa getMPA(int filmId) {
         String sqlQueryMPAId = "SELECT MPA_ID FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?";
-        int mpaId = jdbcTemplate.queryForObject(sqlQueryMPAId, new Object[] {filmId}, Integer.class);
+        int mpaId = jdbcTemplate.queryForObject(sqlQueryMPAId, new Object[]{filmId}, Integer.class);
 
         String sqlQueryMPAFull = "SELECT * FROM MPA WHERE MPA_ID = ?";
         return jdbcTemplate.query(sqlQueryMPAFull, new Object[]{mpaId}, new MpaMapper()).
@@ -94,7 +93,7 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQueryGenreId = "SELECT GENRE_ID FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?";
         List<Integer> listOfGenres = jdbcTemplate.queryForList(sqlQueryGenreId, new Object[]{filmId}, Integer.class);
         String sqlQueryGenreFull = "SELECT * FROM GENRE WHERE GENRE_ID = ?";
-        for(int genreId: listOfGenres) {
+        for (int genreId : listOfGenres) {
             resultList.add(jdbcTemplate.query(sqlQueryGenreFull, new Object[]{genreId}, new GenreMapper()).
                     stream().findFirst().orElse(null));
         }
@@ -103,6 +102,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film modifyFilm(Film film) {
+
         if (getFilmById(film.getId()) == null) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
@@ -120,6 +120,7 @@ public class FilmDbStorage implements FilmStorage {
                 " FILM_RELEASEDATE = ?, FILM_DURATION = ?, FILM_RATING = ? WHERE FILM_ID = ?";
         String addMPA = "INSERT INTO FILM_MPA_ACCORDING (FILM_ID, MPA_ID) VALUES (?, ?)";
         String addGenre = "INSERT INTO FILM_GENRE_ACCORDING (FILM_ID, GENRE_ID) VALUES (?, ?)";
+        String getTestGenre = "SELECT FILM_ID FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ? AND GENRE_ID = ?";
 
         jdbcTemplate.update(sqlQuery,
                 film.getName(),
@@ -134,7 +135,7 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.update(addGenre, film.getId(), genre.getId());
             }
         } else {
-            film.setGenres(new ArrayList<>());
+            film.setGenres(new HashSet<>());
         }
         if (film.getMpa() != null) {
             jdbcTemplate.update(addMPA, film.getId(), film.getMpa().getId());
@@ -185,11 +186,11 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> getPopular(int count) {
         String testLike = "SELECT COUNT(*) FROM LIKED_FILMS";
         int testCount = jdbcTemplate.queryForObject(testLike, Integer.class);
-        if(testCount==0){
+        if (testCount == 0) {
             Collection<Film> resultList = jdbcTemplate.query(testLike, new Object[]{count}, new FilmMapper());
-            for(Film film: resultList) {
+            for (Film film : resultList) {
                 film.setMpa(getMPA(film.getId()));
-                film.setGenres((ArrayList<Genre>) getGenre(film.getId()));
+                film.setGenres((Set<Genre>) getGenre(film.getId()));
             }
             return resultList;
         }
@@ -198,9 +199,9 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM FILMS WHERE FILM_ID IN " +
                 "(SELECT FILM_ID FROM LIKED_FILMS GROUP BY USER_ID ORDER BY COUNT(FILM_ID)) LIMIT ?";
         Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new Object[]{count}, new FilmMapper());
-        for(Film film: resultList) {
+        for (Film film : resultList) {
             film.setMpa(getMPA(film.getId()));
-            film.setGenres((ArrayList<Genre>) getGenre(film.getId()));
+            film.setGenres((Set<Genre>) getGenre(film.getId()));
         }
         return resultList;
     }
@@ -209,11 +210,11 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> getAllPopular() {
         String testLike = "SELECT COUNT(*) FROM LIKED_FILMS";
         int testCount = jdbcTemplate.queryForObject(testLike, Integer.class);
-        if(testCount==0){
+        if (testCount == 0) {
             Collection<Film> resultList = getAll();
-            for(Film film: resultList) {
+            for (Film film : resultList) {
                 film.setMpa(getMPA(film.getId()));
-                film.setGenres((ArrayList<Genre>) getGenre(film.getId()));
+                film.setGenres((Set<Genre>) getGenre(film.getId()));
             }
             return resultList;
         }
@@ -222,9 +223,9 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM FILMS WHERE FILM_ID IN " +
                 "(SELECT FILM_ID FROM LIKED_FILMS GROUP BY USER_ID ORDER BY COUNT(FILM_ID))";
         Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new FilmMapper());
-        for(Film film: resultList) {
+        for (Film film : resultList) {
             film.setMpa(getMPA(film.getId()));
-            film.setGenres((ArrayList<Genre>) getGenre(film.getId()));
+            film.setGenres((Set<Genre>) getGenre(film.getId()));
         }
         return resultList;
     }

@@ -39,16 +39,16 @@ public class FilmService {
         filmStorage.deleteFilm(id);
     }
 
-    public void putLike(int userId, int filmId) {
-        filmStorage.putLike(userId, filmId);
+    public void putLike(int filmId, int userId) {
+        filmStorage.putLike(filmId, userId);
     }
 
     public Film modifyFilm(Film film) throws ParseException {
         return filmStorage.modifyFilm(film);
     }
 
-    public void deleteLike(int userId, int filmId) {
-        filmStorage.deleteLike(userId, filmId);
+    public void deleteLike(int filmId, int userId) {
+        filmStorage.deleteLike(filmId, userId);
     }
 
     public Collection<Film> getPopular(int count) {

@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.text.ParseException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -51,23 +50,21 @@ public class FilmController {
         return filmService.modifyFilm(film);
     }
 
-    @PutMapping("/{id}/like/{userId}")
-    public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
-        filmService.putLike(userId, id);
+    @PutMapping("/{filmId}/like/{userId}")
+    public void putLikeToFilm(@PathVariable int filmId, @PathVariable int userId) {
+        filmService.putLike(filmId, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
-        filmService.deleteLike(userId, id);
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void deleteLikeFromFilm(@PathVariable int filmId, @PathVariable int userId) {
+        filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/popular")
     public Collection<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
         if (count.isPresent()) {
-            System.out.println("найти популярных "+count.get());
             return filmService.getPopular(count.get());
         } else {
-            System.out.println("найти популярных");
             return filmService.getAllPopular();
         }
     }

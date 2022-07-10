@@ -10,7 +10,8 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
@@ -79,7 +80,7 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    public MPA getMPA(int filmId) {
+    public Mpa getMPA(int filmId) {
         String sqlQueryMPAId = "SELECT MPA_ID FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?";
         int mpaId = jdbcTemplate.queryForObject(sqlQueryMPAId, new Object[] {filmId}, Integer.class);
 
@@ -158,13 +159,25 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void putLike(int userId, int filmId) {
+    public void putLike(int filmId, int userId) {
+        if (getFilmById(filmId) == null) {
+            throw new NotFoundException("Фильма с таким id не существует");
+        }
+        if (getUserById(userId) == null) {
+            throw new NotFoundException("Фильма с таким id не существует");
+        }
         String sqlQuery = "INSERT INTO LIKED_FILMS (USER_ID, FILM_ID) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 
     @Override
-    public void deleteLike(int userId, int filmId) {
+    public void deleteLike(int filmId, int userId) {
+        if (getFilmById(filmId) == null) {
+            throw new NotFoundException("Фильма с таким id не существует");
+        }
+        if (getUserById(userId) == null) {
+            throw new NotFoundException("Фильма с таким id не существует");
+        }
         jdbcTemplate.update("DELETE FROM LIKED_FILMS WHERE USER_ID=? AND FILM_ID=?", userId, filmId);
     }
 
@@ -216,12 +229,6 @@ public class FilmDbStorage implements FilmStorage {
         return resultList;
     }
 
-    //SELECT FILMS.FILM_ID, FILM_NAME, FILM_DESCRIPTION, FILM_DURATION, FILM_RELEASEDATE, FILM_RATING FROM FILMS
-    //    WHERE FILM_ID IN (SELECT FILM_ID FROM LIKED_FILMS GROUP BY FILM_ID)
-
-//    SELECT FILMS.FILM_ID, FILM_NAME, FILM_DESCRIPTION, FILM_DURATION, FILM_RELEASEDATE, FILM_RATING FROM FILMS
-//    WHERE FILM_ID IN (SELECT FILM_ID FROM LIKED_FILMS GROUP BY USER_ID ORDER BY COUNT(FILM_ID))
-
     //-------------------Проверка фильма на соотвтетствие-----------------------------------------
     private void validate(Film film) throws ValidationException {
 
@@ -249,6 +256,19 @@ public class FilmDbStorage implements FilmStorage {
         }
         if (film.getMpa() == null) {
             throw new ValidationException("Невозможно запостить фильм без мпа");
+        }
+    }
+
+    public User getUserById(int id) {
+        String sqlQuery = "SELECT * FROM USERS WHERE USER_ID = ?";
+
+        User user = jdbcTemplate.query(sqlQuery, new Object[]{id}, new UserMapper())
+                .stream().findAny().orElse(null);
+
+        if (user == null) {
+            throw new NotFoundException("Юзера с таким id не существует");
+        } else {
+            return user;
         }
     }
 }

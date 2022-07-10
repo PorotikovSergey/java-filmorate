@@ -17,9 +17,9 @@ public interface FilmStorage {
 
     Film modifyFilm(Film film) throws ParseException;
 
-    void putLike(int userId, int filmId);
+    void putLike(int filmId, int userId);
 
-    void deleteLike(int userId, int filmId);
+    void deleteLike(int filmId, int userId);
 
     Collection<Film> getPopular(int count);
 

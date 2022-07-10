@@ -25,9 +25,9 @@ public class MpaDbStorage implements MpaStorage {
     public Mpa getMpaById(int id) {
         String sqlQueryMPAId = "SELECT * FROM MPA WHERE MPA_ID = ?";
 
-        Mpa mpa = jdbcTemplate.query(sqlQueryMPAId, new Object[]{id}, new MpaMapper()).
+        Mpa mpa = jdbcTemplate.query(sqlQueryMPAId, new MpaMapper(), id).
                 stream().findFirst().orElse(null);
-        if(mpa==null) {
+        if (mpa == null) {
             throw new NotFoundException("Мпа с таким id не существует");
         } else {
             return mpa;

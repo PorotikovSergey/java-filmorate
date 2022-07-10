@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
 import java.util.*;
 
 @Slf4j
@@ -35,7 +36,7 @@ public class UserService {
     }
 
     public List<User> getAllFriends(int id) {
-        return (List<User>) userStorage.getAllConfirmedFriends(id);
+        return userStorage.getAllConfirmedFriends(id);
     }
 
     public void setFriendship(int firstId, int secondId) {
@@ -45,7 +46,6 @@ public class UserService {
     public void breakFriendship(int firstId, int secondId) {
         userStorage.breakFriendship(firstId, secondId);
     }
-
 
     public void deleteUser(int id) {
         userStorage.deleteUser(id);

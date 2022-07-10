@@ -23,6 +23,7 @@ import java.util.*;
 @Component
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
+    static final String NO_SUCH_FILM = "Фильма с таким id не существует";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -54,7 +55,8 @@ public class FilmDbStorage implements FilmStorage {
             stmt.setInt(5, film.getRate());
             return stmt;
         }, keyHolder);
-        film.setId(keyHolder.getKey().intValue());
+        int key = keyHolder.getKey().intValue();
+        film.setId(key);
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
                 jdbcTemplate.update(addGenre, film.getId(), genre.getId());
@@ -68,45 +70,24 @@ public class FilmDbStorage implements FilmStorage {
     public Film getFilmById(int id) {
         String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID = ?";
 
-        Film film = jdbcTemplate.query(sqlQuery, new Object[]{id}, new FilmMapper())
+        Film film = jdbcTemplate.query(sqlQuery, new FilmMapper(), id)
                 .stream().findAny().orElse(null);
         if (film == null) {
-            throw new NotFoundException("Фильма с таким id не существует");
+            throw new NotFoundException(NO_SUCH_FILM);
         }
         film.setMpa(getMPA(film.getId()));
         film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
         return film;
     }
 
-    public Mpa getMPA(int filmId) {
-        String sqlQueryMPAId = "SELECT MPA_ID FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?";
-        int mpaId = jdbcTemplate.queryForObject(sqlQueryMPAId, new Object[]{filmId}, Integer.class);
-
-        String sqlQueryMPAFull = "SELECT * FROM MPA WHERE MPA_ID = ?";
-        return jdbcTemplate.query(sqlQueryMPAFull, new Object[]{mpaId}, new MpaMapper()).
-                stream().findFirst().orElse(null);
-    }
-
-    public Collection<Genre> getGenre(int filmId) {
-        Set<Genre> resultList = new LinkedHashSet <>();
-        String sqlQueryGenreId = "SELECT GENRE_ID FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?";
-        List<Integer> listOfGenres = jdbcTemplate.queryForList(sqlQueryGenreId, new Object[]{filmId}, Integer.class);
-        String sqlQueryGenreFull = "SELECT * FROM GENRE WHERE GENRE_ID = ?";
-        for (int genreId : listOfGenres) {
-            resultList.add(jdbcTemplate.query(sqlQueryGenreFull, new Object[]{genreId}, new GenreMapper()).
-                    stream().findFirst().orElse(null));
-        }
-        return resultList;
-    }
-
     @Override
     public Film modifyFilm(Film film) {
 
         if (getFilmById(film.getId()) == null) {
-            throw new NotFoundException("Фильма с таким id не существует");
+            throw new NotFoundException(NO_SUCH_FILM);
         }
 
-        if (getGenre(film.getId()).size() > 0) {
+        if (!getGenre(film.getId()).isEmpty()) {
             jdbcTemplate.update("DELETE FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?", film.getId());
         }
 
@@ -119,7 +100,6 @@ public class FilmDbStorage implements FilmStorage {
                 " FILM_RELEASEDATE = ?, FILM_DURATION = ?, FILM_RATING = ? WHERE FILM_ID = ?";
         String addMPA = "INSERT INTO FILM_MPA_ACCORDING (FILM_ID, MPA_ID) VALUES (?, ?)";
         String addGenre = "INSERT INTO FILM_GENRE_ACCORDING (FILM_ID, GENRE_ID) VALUES (?, ?)";
-        String getTestGenre = "SELECT FILM_ID FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ? AND GENRE_ID = ?";
 
         jdbcTemplate.update(sqlQuery,
                 film.getName(),
@@ -150,7 +130,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void deleteFilm(int id) {
         if (getFilmById(id) == null) {
-            throw new NotFoundException("Фильма с таким id не существует");
+            throw new NotFoundException(NO_SUCH_FILM);
         }
         jdbcTemplate.update("DELETE FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?", id);
         jdbcTemplate.update("DELETE FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?", id);
@@ -161,10 +141,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void putLike(int filmId, int userId) {
         if (getFilmById(filmId) == null) {
-            throw new NotFoundException("Фильма с таким id не существует");
+            throw new NotFoundException(NO_SUCH_FILM);
         }
         if (getUserById(userId) == null) {
-            throw new NotFoundException("Фильма с таким id не существует");
+            throw new NotFoundException(NO_SUCH_FILM);
         }
         String sqlQuery = "INSERT INTO LIKED_FILMS (USER_ID, FILM_ID) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
@@ -173,10 +153,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void deleteLike(int filmId, int userId) {
         if (getFilmById(filmId) == null) {
-            throw new NotFoundException("Фильма с таким id не существует");
+            throw new NotFoundException(NO_SUCH_FILM);
         }
         if (getUserById(userId) == null) {
-            throw new NotFoundException("Фильма с таким id не существует");
+            throw new NotFoundException("Юзера с таким id не существует");
         }
         jdbcTemplate.update("DELETE FROM LIKED_FILMS WHERE USER_ID=? AND FILM_ID=?", userId, filmId);
     }
@@ -186,7 +166,7 @@ public class FilmDbStorage implements FilmStorage {
         String testLike = "SELECT COUNT(*) FROM LIKED_FILMS";
         int testCount = jdbcTemplate.queryForObject(testLike, Integer.class);
         if (testCount == 0) {
-            Collection<Film> resultList = jdbcTemplate.query(testLike, new Object[]{count}, new FilmMapper());
+            Collection<Film> resultList = jdbcTemplate.query(testLike, new FilmMapper(), count);
             for (Film film : resultList) {
                 film.setMpa(getMPA(film.getId()));
                 film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
@@ -197,7 +177,7 @@ public class FilmDbStorage implements FilmStorage {
                 "FILM_DURATION, FILM_RELEASEDATE, FILM_RATING " +
                 "FROM FILMS WHERE FILM_ID IN " +
                 "(SELECT FILM_ID FROM LIKED_FILMS GROUP BY USER_ID ORDER BY COUNT(FILM_ID)) LIMIT ?";
-        Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new Object[]{count}, new FilmMapper());
+        Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new FilmMapper(), count);
         for (Film film : resultList) {
             film.setMpa(getMPA(film.getId()));
             film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
@@ -229,11 +209,10 @@ public class FilmDbStorage implements FilmStorage {
         return resultList;
     }
 
-    //-------------------Проверка фильма на соотвтетствие-----------------------------------------
     private void validate(Film film) throws ValidationException {
 
         final int MAX_DESCRIPTION_LENGTH = 200;
-        final LocalDate FIRST_CINEMA_DATE = LocalDate.of(1895, 12, 28);
+        final LocalDate firstCinemaDate = LocalDate.of(1895, 12, 28);
 
 
         if (film.getId() < 0) {
@@ -247,8 +226,8 @@ public class FilmDbStorage implements FilmStorage {
             throw new ValidationException("Невозможно запостить фильм  с описанием больше "
                     + MAX_DESCRIPTION_LENGTH + " символов");
         }
-        if (film.getReleaseDate().isBefore(FIRST_CINEMA_DATE)) {
-            throw new ValidationException("Невозможно запостить фильм с датой выпуска раньше " + FIRST_CINEMA_DATE);
+        if (film.getReleaseDate().isBefore(firstCinemaDate)) {
+            throw new ValidationException("Невозможно запостить фильм с датой выпуска раньше " + firstCinemaDate);
         }
         if (film.getDuration() < 0) {
             throw new ValidationException("Невозможно запостить фильм с отрицательной длительностью: "
@@ -262,7 +241,7 @@ public class FilmDbStorage implements FilmStorage {
     public User getUserById(int id) {
         String sqlQuery = "SELECT * FROM USERS WHERE USER_ID = ?";
 
-        User user = jdbcTemplate.query(sqlQuery, new Object[]{id}, new UserMapper())
+        User user = jdbcTemplate.query(sqlQuery, new UserMapper(), id)
                 .stream().findAny().orElse(null);
 
         if (user == null) {
@@ -270,5 +249,26 @@ public class FilmDbStorage implements FilmStorage {
         } else {
             return user;
         }
+    }
+
+    public Mpa getMPA(int filmId) {
+        String sqlQueryMPAId = "SELECT MPA_ID FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?";
+        int mpaId = jdbcTemplate.queryForObject(sqlQueryMPAId, Integer.class, filmId);
+
+        String sqlQueryMPAFull = "SELECT * FROM MPA WHERE MPA_ID = ?";
+        return jdbcTemplate.query(sqlQueryMPAFull, new MpaMapper(), mpaId).
+                stream().findFirst().orElse(null);
+    }
+
+    public Collection<Genre> getGenre(int filmId) {
+        Set<Genre> resultList = new LinkedHashSet<>();
+        String sqlQueryGenreId = "SELECT GENRE_ID FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?";
+        List<Integer> listOfGenres = jdbcTemplate.queryForList(sqlQueryGenreId, Integer.class, filmId);
+        String sqlQueryGenreFull = "SELECT * FROM GENRE WHERE GENRE_ID = ?";
+        for (int genreId : listOfGenres) {
+            resultList.add(jdbcTemplate.query(sqlQueryGenreFull, new GenreMapper(), genreId).
+                    stream().findFirst().orElse(null));
+        }
+        return resultList;
     }
 }

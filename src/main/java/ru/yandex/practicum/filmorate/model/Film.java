@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 
-
 import lombok.Data;
 
 @Data

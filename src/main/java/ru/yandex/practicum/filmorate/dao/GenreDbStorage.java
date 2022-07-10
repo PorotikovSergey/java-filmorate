@@ -26,9 +26,9 @@ public class GenreDbStorage implements GenreStorage {
     public Genre getGenreById(int id) {
         String sqlQueryGenreId = "SELECT * FROM GENRE WHERE GENRE_ID = ?";
 
-        Genre genre = jdbcTemplate.query(sqlQueryGenreId, new Object[]{id}, new GenreMapper()).
+        Genre genre = jdbcTemplate.query(sqlQueryGenreId, new GenreMapper(), id).
                 stream().findFirst().orElse(null);
-        if(genre==null) {
+        if (genre == null) {
             throw new NotFoundException("Жанра с таким id не существует");
         } else {
             return genre;

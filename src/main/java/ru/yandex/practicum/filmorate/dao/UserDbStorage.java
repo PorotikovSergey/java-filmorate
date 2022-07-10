@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 @Repository
 @Slf4j
 public class UserDbStorage implements UserStorage {
+    static final String NO_SUCH_USER = "Юзера с таким id не существует";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -50,7 +51,8 @@ public class UserDbStorage implements UserStorage {
             }
             return stmt;
         }, keyHolder);
-        user.setId(keyHolder.getKey().intValue());
+        int key = keyHolder.getKey().intValue();
+        user.setId(key);
         return user;
     }
 
@@ -64,11 +66,11 @@ public class UserDbStorage implements UserStorage {
     public User getUserById(int id) {
         String sqlQuery = "SELECT * FROM USERS WHERE USER_ID = ?";
 
-        User user = jdbcTemplate.query(sqlQuery, new Object[]{id}, new UserMapper())
+        User user = jdbcTemplate.query(sqlQuery, new UserMapper(), id)
                 .stream().findAny().orElse(null);
 
         if (user == null) {
-            throw new NotFoundException("Юзера с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         } else {
             return user;
         }
@@ -77,7 +79,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User modifyUser(User user) {
         if (getUserById(user.getId()) == null) {
-            throw new NotFoundException("Юзера с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         }
         validate(user);
         String sqlQuery = "UPDATE USERS SET  USER_NAME = ?, USER_LOGIN = ?," +
@@ -96,35 +98,35 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAllConfirmedFriends(int id) {
         if (getUserById(id) == null) {
-            throw new NotFoundException("Юзера с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         }
         String sql = "SELECT * FROM USERS WHERE USER_ID IN (SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = ?)";
-        return jdbcTemplate.query(sql, new Object[]{id}, new UserMapper());
+        return jdbcTemplate.query(sql, new UserMapper(), id);
     }
 
     @Override
     public List<User> getCommonFriends(int id, int otherId) {
         if (getUserById(id) == null) {
-            throw new NotFoundException("Юзера n1 с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         }
         if (getUserById(otherId) == null) {
-            throw new NotFoundException("Юзера n2 с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         }
 
         String sql = "SELECT * FROM USERS WHERE USER_ID IN " +
                 "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = ? and FRIEND_ID IN " +
                 "(SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = ?))";
 
-        return jdbcTemplate.query(sql, new Object[]{id, otherId}, new UserMapper());
+        return jdbcTemplate.query(sql, new UserMapper(), id, otherId);
     }
 
     @Override
     public void setFriendship(int firstId, int secondId) {
         if (getUserById(firstId) == null) {
-            throw new NotFoundException("Юзера n1 с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         }
         if (getUserById(secondId) == null) {
-            throw new NotFoundException("Юзера n2 с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         }
         String sqlQuery = "INSERT INTO FRIENDSHIP (USER_ID, FRIEND_ID, STATUS)" +
                 "VALUES (?,?,?)";
@@ -146,16 +148,15 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query("SELECT * FROM users", new UserMapper());
     }
 
-    //---------------------Проверка юзера на соответствие-------------------------------------
     private void validate(User user) throws ValidationException {
-        final Pattern EMAIL_PATTERN = Pattern.compile(
+        Pattern emailPattern = Pattern.compile(
                 "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");
 
         if (user.getId() < 0) {
             throw new ValidationException("Id юзера не может быть отрицательным. " +
                     "Вы пытаетесь задать id: " + user.getId());
         }
-        if (!EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
+        if (!emailPattern.matcher(user.getEmail()).matches()) {
             throw new ValidationException("Email " + user.getEmail() + " не соответсвтует требованиям.");
         }
         if ((user.getLogin().isBlank()) || user.getLogin().contains(" ")) {

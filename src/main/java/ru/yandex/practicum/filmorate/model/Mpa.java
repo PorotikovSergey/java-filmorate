@@ -8,9 +8,10 @@ public class Mpa {
     private String name;
 
     public Mpa(int id, String name) {
-        this.id=id;
-        this.name=name;
+        this.id = id;
+        this.name = name;
     }
+
     public Mpa() {
     }
 }

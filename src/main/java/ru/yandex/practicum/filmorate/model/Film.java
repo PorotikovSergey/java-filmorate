@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.LinkedHashSet;
+
 
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class Film {
     private int duration;
     private int rate;
     private Mpa mpa;
-    private Set<Genre> genres;
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 
     public Film(String name, String description, LocalDate releaseDate, int duration, int rate) {
         this.name = name;

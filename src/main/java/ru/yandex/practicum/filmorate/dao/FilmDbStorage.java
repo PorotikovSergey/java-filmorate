@@ -24,6 +24,7 @@ import java.util.*;
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
     static final String NO_SUCH_FILM = "Фильма с таким id не существует";
+    static final String NO_SUCH_USER = "Юзера с таким id не существует";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -144,7 +145,7 @@ public class FilmDbStorage implements FilmStorage {
             throw new NotFoundException(NO_SUCH_FILM);
         }
         if (getUserById(userId) == null) {
-            throw new NotFoundException(NO_SUCH_FILM);
+            throw new NotFoundException(NO_SUCH_USER);
         }
         String sqlQuery = "INSERT INTO LIKED_FILMS (USER_ID, FILM_ID) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
@@ -156,7 +157,7 @@ public class FilmDbStorage implements FilmStorage {
             throw new NotFoundException(NO_SUCH_FILM);
         }
         if (getUserById(userId) == null) {
-            throw new NotFoundException("Юзера с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         }
         jdbcTemplate.update("DELETE FROM LIKED_FILMS WHERE USER_ID=? AND FILM_ID=?", userId, filmId);
     }
@@ -238,14 +239,14 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    public User getUserById(int id) {
+    private User getUserById(int id) {
         String sqlQuery = "SELECT * FROM USERS WHERE USER_ID = ?";
 
         User user = jdbcTemplate.query(sqlQuery, new UserMapper(), id)
                 .stream().findAny().orElse(null);
 
         if (user == null) {
-            throw new NotFoundException("Юзера с таким id не существует");
+            throw new NotFoundException(NO_SUCH_USER);
         } else {
             return user;
         }
@@ -260,7 +261,7 @@ public class FilmDbStorage implements FilmStorage {
                 stream().findFirst().orElse(null);
     }
 
-    public Collection<Genre> getGenre(int filmId) {
+   public Collection<Genre> getGenre(int filmId) {
         Set<Genre> resultList = new LinkedHashSet<>();
         String sqlQueryGenreId = "SELECT GENRE_ID FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?";
         List<Integer> listOfGenres = jdbcTemplate.queryForList(sqlQueryGenreId, Integer.class, filmId);

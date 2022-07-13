@@ -90,12 +90,11 @@ class DbUserStorageTest {
                 LocalDate.of(1991, 8, 12));
         userStorage.addUser(testUser);
         Collection<User> allUsers = userStorage.getAll();
-
-        assertEquals(1, allUsers.size(), "В списке должен быть 1 пользователь");
+        assertEquals(9, allUsers.size(), "В списке по итогу всех тестов 9 пользователей");
 
         userStorage.deleteUser(9);
         Collection<User> allUsersAfterDeleteOne = userStorage.getAll();
-        assertEquals(0, allUsersAfterDeleteOne.size(),  "В списке не должно остаться пользователей");
+        assertEquals(8, allUsersAfterDeleteOne.size(),  "В списке должно остаться 8 юзеров");
     }
 
 }

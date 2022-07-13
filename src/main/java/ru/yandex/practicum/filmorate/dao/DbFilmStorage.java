@@ -77,7 +77,7 @@ public class DbFilmStorage implements FilmStorage {
             throw new NotFoundException(NO_SUCH_FILM);
         }
         film.setMpa(getMpa(film.getId()));
-        film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
+        film.setGenres(getGenre(film.getId()));
         return film;
     }
 
@@ -114,8 +114,7 @@ public class DbFilmStorage implements FilmStorage {
             for (Genre genre : film.getGenres()) {
                 jdbcTemplate.update(addGenre, film.getId(), genre.getId());
             }
-        } else {
-            film.setGenres(new LinkedHashSet<>());
+            film.setGenres(getGenre(film.getId()));
         }
         if (film.getMpa() != null) {
             jdbcTemplate.update(addMPA, film.getId(), film.getMpa().getId());
@@ -170,7 +169,7 @@ public class DbFilmStorage implements FilmStorage {
             Collection<Film> resultList = jdbcTemplate.query(testLike, new FilmMapper(), count);
             for (Film film : resultList) {
                 film.setMpa(getMpa(film.getId()));
-                film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
+                film.setGenres(getGenre(film.getId()));
             }
             return resultList;
         }
@@ -181,7 +180,7 @@ public class DbFilmStorage implements FilmStorage {
         Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new FilmMapper(), count);
         for (Film film : resultList) {
             film.setMpa(getMpa(film.getId()));
-            film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
+            film.setGenres(getGenre(film.getId()));
         }
         return resultList;
     }
@@ -194,7 +193,7 @@ public class DbFilmStorage implements FilmStorage {
             Collection<Film> resultList = getAll();
             for (Film film : resultList) {
                 film.setMpa(getMpa(film.getId()));
-                film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
+                film.setGenres(getGenre(film.getId()));
             }
             return resultList;
         }
@@ -205,7 +204,7 @@ public class DbFilmStorage implements FilmStorage {
         Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new FilmMapper());
         for (Film film : resultList) {
             film.setMpa(getMpa(film.getId()));
-            film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
+            film.setGenres(getGenre(film.getId()));
         }
         return resultList;
     }
@@ -253,16 +252,16 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     public Mpa getMpa(int filmId) {
-        String sqlQueryMPAId = "SELECT MPA_ID FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?";
-        int mpaId = jdbcTemplate.queryForObject(sqlQueryMPAId, Integer.class, filmId);
+        String sqlQueryMpaId = "SELECT MPA_ID FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?";
+        int mpaId = jdbcTemplate.queryForObject(sqlQueryMpaId, Integer.class, filmId);
 
-        String sqlQueryMPAFull = "SELECT * FROM MPA WHERE MPA_ID = ?";
-        return jdbcTemplate.query(sqlQueryMPAFull, new MpaMapper(), mpaId).
+        String sqlQueryMpaFull = "SELECT * FROM MPA WHERE MPA_ID = ?";
+        return jdbcTemplate.query(sqlQueryMpaFull, new MpaMapper(), mpaId).
                 stream().findFirst().orElse(null);
     }
 
-   public Collection<Genre> getGenre(int filmId) {
-        Set<Genre> resultList = new LinkedHashSet<>();
+    public Set<Genre> getGenre(int filmId) {
+        Set<Genre> resultList = new TreeSet<>(Comparator.comparingInt(Genre::getId));
         String sqlQueryGenreId = "SELECT GENRE_ID FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?";
         List<Integer> listOfGenres = jdbcTemplate.queryForList(sqlQueryGenreId, Integer.class, filmId);
         String sqlQueryGenreFull = "SELECT * FROM GENRE WHERE GENRE_ID = ?";

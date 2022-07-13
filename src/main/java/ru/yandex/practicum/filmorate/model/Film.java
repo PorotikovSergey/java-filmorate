@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import lombok.Data;
 
@@ -14,7 +16,7 @@ public class Film {
     private int duration;
     private int rate;
     private Mpa mpa;
-    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
 
     public Film(String name, String description, LocalDate releaseDate, int duration, int rate) {
         this.name = name;

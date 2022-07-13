@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.*;
@@ -18,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class GenreDbStorageTest {
     private final GenreDbStorage genreDbStorage;
 
-    @Transactional
     @Test
     void getAll() {
         List<Genre> genreList = (ArrayList<Genre>) genreDbStorage.getAll();
@@ -32,7 +30,6 @@ class GenreDbStorageTest {
 
     }
 
-    @Transactional
     @Test
     void getById() {
         Genre genre = genreDbStorage.getGenreById(3);

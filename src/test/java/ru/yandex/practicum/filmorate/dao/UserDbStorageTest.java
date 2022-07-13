@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -19,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserDbStorageTest {
     private final UserDbStorage userStorage;
 
-    @Transactional
     @Test
     void setAndBreakFiendship() {
         User testUser1 = new User("mymail@mail.ru", "userLogin", "Vasya",
@@ -38,7 +36,6 @@ class UserDbStorageTest {
         assertFalse(friendsAfterDeleteOne.contains(testUser2), "Возвращённый юзер должен быть равен обновленному");
     }
 
-    @Transactional
     @Test
     void getCommonFriends() {
         User testUser3 = new User("mymail@mail.ru", "userLogin", "Vasya",
@@ -63,7 +60,6 @@ class UserDbStorageTest {
         assertTrue(commonFriends.contains(testUser4), "Общим должен быть Vova");
     }
 
-    @Transactional
     @Test
     void createAndReturnUserById() {
         User testUser = new User("mymail@mail.ru", "userLogin", "Vasya",
@@ -73,7 +69,6 @@ class UserDbStorageTest {
         assertEquals(testUser, returnUser, "Возвращённый юзер должен быть равен изначально созданному");
     }
 
-    @Transactional
     @Test
     void refreshAndReturnUserById() {
         User testUser = new User("mymail@mail.ru", "userLogin", "Vasya",
@@ -89,7 +84,6 @@ class UserDbStorageTest {
         assertEquals(refreshedUser, returnUser, "Возвращённый юзер должен быть равен обновленному");
     }
 
-    @Transactional
     @Test
     void deleteUserById() {
         User testUser = new User("mymail@mail.ru", "userLogin", "Vasya",

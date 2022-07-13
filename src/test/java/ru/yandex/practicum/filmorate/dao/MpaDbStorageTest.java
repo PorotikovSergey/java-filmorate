@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.*;
@@ -18,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MpaDbStorageTest {
     private final MpaDbStorage mpaDbStorage;
 
-    @Transactional
     @Test
     void getAll() {
         List<Mpa> mpaList = (ArrayList<Mpa>) mpaDbStorage.getAll();
@@ -30,7 +28,6 @@ class MpaDbStorageTest {
         assertEquals("NC-17", mpaList.get(4).getName(), "Правильный мпа -NC-17");
     }
 
-    @Transactional
     @Test
     void getById() {
         Mpa mpa = mpaDbStorage.getMpaById(3);

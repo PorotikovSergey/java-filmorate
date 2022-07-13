@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -23,7 +22,6 @@ class FilmDbStorageTest {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
 
-    @Transactional
     @Test
     void deleteFilms() {
         System.out.println("удаление");
@@ -50,7 +48,6 @@ class FilmDbStorageTest {
         assertEquals(0, filmStorage.getAll().size(), "Список фильмов должен стать пустым");
     }
 
-    @Transactional
     @Test
     void createAndReturnFilmById() {
         System.out.println("создание");
@@ -77,8 +74,6 @@ class FilmDbStorageTest {
                 "Возвращённое мпа должно быть G");
     }
 
-
-    @Transactional
     @Test
     void refreshAndReturnFilmById() {
         System.out.println("обновление");
@@ -106,7 +101,6 @@ class FilmDbStorageTest {
                 "Теперь возвращённый фильм должен быть Остин Пауэрс");
     }
 
-    @Transactional
     @Test
     void putLikeAndGetPopular() {
         System.out.println("лайк");

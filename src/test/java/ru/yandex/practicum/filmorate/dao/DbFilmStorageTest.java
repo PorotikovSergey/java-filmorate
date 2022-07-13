@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class FilmDbStorageTest {
-    private final FilmDbStorage filmStorage;
-    private final UserDbStorage userStorage;
+class DbFilmStorageTest {
+    private final DbFilmStorage filmStorage;
+    private final DbUserStorage userStorage;
 
     @Test
     void deleteFilms() {
@@ -66,7 +66,7 @@ class FilmDbStorageTest {
                 "Возвращённый фильм должен быть равен изначально созданному");
 
         List<Genre> genreList = new ArrayList<>(filmStorage.getGenre(3));
-        Mpa returnMpa = filmStorage.getMPA(3);
+        Mpa returnMpa = filmStorage.getMpa(3);
 
         assertEquals("Драма", genreList.get(0).getName(),
                 "Возвращённый жанр должен быть Драма");

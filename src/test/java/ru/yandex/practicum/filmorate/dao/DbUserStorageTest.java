@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserDbStorageTest {
-    private final UserDbStorage userStorage;
+class DbUserStorageTest {
+    private final DbUserStorage userStorage;
 
     @Test
     void setAndBreakFiendship() {

@@ -14,11 +14,11 @@ import java.util.Collection;
 @Component
 @Repository
 @Slf4j
-public class GenreDbStorage implements GenreStorage {
+public class DbGenreStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
+    public DbGenreStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

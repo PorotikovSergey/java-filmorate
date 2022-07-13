@@ -14,11 +14,11 @@ import java.util.Collection;
 @Component
 @Repository
 @Slf4j
-public class MpaDbStorage implements MpaStorage {
+public class DbMpaStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public MpaDbStorage(JdbcTemplate jdbcTemplate) {
+    public DbMpaStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

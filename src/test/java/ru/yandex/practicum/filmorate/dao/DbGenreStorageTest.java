@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class GenreDbStorageTest {
-    private final GenreDbStorage genreDbStorage;
+class DbGenreStorageTest {
+    private final DbGenreStorage dbGenreStorage;
 
     @Test
     void getAll() {
-        List<Genre> genreList = (ArrayList<Genre>) genreDbStorage.getAll();
+        List<Genre> genreList = (ArrayList<Genre>) dbGenreStorage.getAll();
         assertEquals(6, genreList.size(), "Всего должно быть 6 жанров");
         assertEquals("Комедия", genreList.get(0).getName(), "Правильный жанр - Комедия");
         assertEquals("Драма", genreList.get(1).getName(), "Правильный жанр - Драма");
@@ -32,7 +32,7 @@ class GenreDbStorageTest {
 
     @Test
     void getById() {
-        Genre genre = genreDbStorage.getGenreById(3);
+        Genre genre = dbGenreStorage.getGenreById(3);
         assertEquals("Мультфильм", genre.getName(), "Правильный жанр - Мультфильм");
     }
 }

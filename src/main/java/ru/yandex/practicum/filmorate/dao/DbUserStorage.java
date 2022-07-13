@@ -23,12 +23,12 @@ import java.util.regex.Pattern;
 @Component
 @Repository
 @Slf4j
-public class UserDbStorage implements UserStorage {
+public class DbUserStorage implements UserStorage {
     static final String NO_SUCH_USER = "Юзера с таким id не существует";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public DbUserStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

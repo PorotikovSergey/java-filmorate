@@ -22,13 +22,13 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class FilmDbStorage implements FilmStorage {
+public class DbFilmStorage implements FilmStorage {
     static final String NO_SUCH_FILM = "Фильма с таким id не существует";
     static final String NO_SUCH_USER = "Юзера с таким id не существует";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
+    public DbFilmStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -76,7 +76,7 @@ public class FilmDbStorage implements FilmStorage {
         if (film == null) {
             throw new NotFoundException(NO_SUCH_FILM);
         }
-        film.setMpa(getMPA(film.getId()));
+        film.setMpa(getMpa(film.getId()));
         film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
         return film;
     }
@@ -92,7 +92,7 @@ public class FilmDbStorage implements FilmStorage {
             jdbcTemplate.update("DELETE FROM FILM_GENRE_ACCORDING WHERE FILM_ID = ?", film.getId());
         }
 
-        if (getMPA(film.getId()) != null) {
+        if (getMpa(film.getId()) != null) {
             jdbcTemplate.update("DELETE FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?", film.getId());
         }
 
@@ -169,7 +169,7 @@ public class FilmDbStorage implements FilmStorage {
         if (testCount == 0) {
             Collection<Film> resultList = jdbcTemplate.query(testLike, new FilmMapper(), count);
             for (Film film : resultList) {
-                film.setMpa(getMPA(film.getId()));
+                film.setMpa(getMpa(film.getId()));
                 film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
             }
             return resultList;
@@ -180,7 +180,7 @@ public class FilmDbStorage implements FilmStorage {
                 "(SELECT FILM_ID FROM LIKED_FILMS GROUP BY USER_ID ORDER BY COUNT(FILM_ID)) LIMIT ?";
         Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new FilmMapper(), count);
         for (Film film : resultList) {
-            film.setMpa(getMPA(film.getId()));
+            film.setMpa(getMpa(film.getId()));
             film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
         }
         return resultList;
@@ -193,7 +193,7 @@ public class FilmDbStorage implements FilmStorage {
         if (testCount == 0) {
             Collection<Film> resultList = getAll();
             for (Film film : resultList) {
-                film.setMpa(getMPA(film.getId()));
+                film.setMpa(getMpa(film.getId()));
                 film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
             }
             return resultList;
@@ -204,7 +204,7 @@ public class FilmDbStorage implements FilmStorage {
                 "(SELECT FILM_ID FROM LIKED_FILMS GROUP BY USER_ID ORDER BY COUNT(FILM_ID))";
         Collection<Film> resultList = jdbcTemplate.query(sqlQuery, new FilmMapper());
         for (Film film : resultList) {
-            film.setMpa(getMPA(film.getId()));
+            film.setMpa(getMpa(film.getId()));
             film.setGenres((LinkedHashSet<Genre>) getGenre(film.getId()));
         }
         return resultList;
@@ -252,7 +252,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    public Mpa getMPA(int filmId) {
+    public Mpa getMpa(int filmId) {
         String sqlQueryMPAId = "SELECT MPA_ID FROM FILM_MPA_ACCORDING WHERE FILM_ID = ?";
         int mpaId = jdbcTemplate.queryForObject(sqlQueryMPAId, Integer.class, filmId);
 

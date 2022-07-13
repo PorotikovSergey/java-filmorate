@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class MpaDbStorageTest {
-    private final MpaDbStorage mpaDbStorage;
+class DbMpaStorageTest {
+    private final DbMpaStorage dbMpaStorage;
 
     @Test
     void getAll() {
-        List<Mpa> mpaList = (ArrayList<Mpa>) mpaDbStorage.getAll();
+        List<Mpa> mpaList = (ArrayList<Mpa>) dbMpaStorage.getAll();
         assertEquals(5, mpaList.size(), "Всего должно быть 5 мпа");
         assertEquals("G", mpaList.get(0).getName(), "Правильный мпа -G");
         assertEquals("PG", mpaList.get(1).getName(), "Правильный мпа -PG");
@@ -30,7 +30,7 @@ class MpaDbStorageTest {
 
     @Test
     void getById() {
-        Mpa mpa = mpaDbStorage.getMpaById(3);
+        Mpa mpa = dbMpaStorage.getMpaById(3);
         assertEquals("PG-13", mpa.getName(), "Правильный мпа -PG-13");
     }
 }

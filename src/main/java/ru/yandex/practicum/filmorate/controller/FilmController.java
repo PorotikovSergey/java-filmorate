@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
+import java.text.ParseException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,47 +25,47 @@ public class FilmController {
         this.filmService = service;
     }
 
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        return filmService.getFilmById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void remove(@PathVariable int id) {
+        filmService.deleteFilm(id);
+    }
+
     @GetMapping
     public Collection<Film> findAll() {
         return filmService.getAll();
     }
 
     @PostMapping
-    public Film create(@RequestBody Film film) {
+    public Film create(@RequestBody Film film) throws ParseException {
         return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Film refresh(@RequestBody Film film) {
+    public Film refresh(@RequestBody Film film) throws ParseException {
         return filmService.modifyFilm(film);
     }
 
-    @DeleteMapping("/{id}")
-    public Film remove(@PathVariable int id) {
-        return filmService.deleteFilm(id);
+    @PutMapping("/{filmId}/like/{userId}")
+    public void putLikeToFilm(@PathVariable int filmId, @PathVariable int userId) {
+        filmService.putLike(filmId, userId);
     }
 
-    @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable int id) {
-        return filmService.getFilmById(id);
-    }
-
-    @PutMapping("/{id}/like/{userId}")
-    public void putLikeToFilm(@PathVariable int id, @PathVariable int userId) {
-        filmService.putLike(userId, id);
-    }
-
-    @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLikeFromFilm(@PathVariable int id, @PathVariable int userId) {
-        filmService.deleteLike(userId, id);
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void deleteLikeFromFilm(@PathVariable int filmId, @PathVariable int userId) {
+        filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
+    public Collection<Film> getCertainAmountOfLikedFilms(@RequestParam Optional<Integer> count) {
         if (count.isPresent()) {
-            return filmService.getCertainAmountOfLikedFilms(count.get());
+            return filmService.getPopular(count.get());
         } else {
-            return filmService.getCertainAmountOfLikedFilms(10);
+            return filmService.getAllPopular();
         }
     }
 }

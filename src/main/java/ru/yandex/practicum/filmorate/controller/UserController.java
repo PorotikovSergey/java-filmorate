@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+
 import java.util.Collection;
 
 @Slf4j
@@ -16,6 +17,11 @@ public class UserController {
     @Autowired
     public UserController(UserService service) {
         this.userService = service;
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable int id) {
+        return userService.getUserById(id);
     }
 
     @GetMapping
@@ -34,13 +40,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public User removeUser(@PathVariable int id) {
-        return userService.deleteUser(id);
-    }
-
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable int id) {
-        return userService.getUserById(id);
+    public void removeUser(@PathVariable int id) {
+        userService.deleteUser(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

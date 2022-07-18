@@ -2,10 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
 import java.util.*;
 
 @Slf4j
@@ -14,65 +15,12 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("dbUserStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
-    public void setFriendship(int firstId, int secondId) {
-        if (firstId < 0) {
-            log.debug("Отрицательный id {} юзера", firstId);
-            throw new NotFoundException("Отрицательный id первого юзера.");
-        }
-        if (secondId < 0) {
-            log.debug("Отрицательный id {} второго юзера", secondId);
-            throw new NotFoundException("Отрицательный id второго юзера.");
-        }
-        userStorage.getUserById(firstId).getFriends().add(secondId);
-        log.debug("У первого юзера стало {} друзей", userStorage.getUserById(firstId).getFriends().size());
-        userStorage.getUserById(secondId).getFriends().add(firstId);
-        log.debug("У второго юзера стало {} друзей", userStorage.getUserById(secondId).getFriends().size());
-    }
-
-    public void breakFriendship(int firstId, int secondId) {
-        if (firstId < 0) {
-            log.debug("Отрицательный id {} юзера", firstId);
-            throw new NotFoundException("Отрицательный id первого юзера.");
-        }
-        if (secondId < 0) {
-            log.debug("Отрицательный id {} второго юзера", secondId);
-            throw new NotFoundException("Отрицательный id второго юзера.");
-        }
-        userStorage.getUserById(firstId).getFriends().remove(secondId);
-        log.debug("У первого юзера стало {} друзей", userStorage.getUserById(firstId).getFriends().size());
-        userStorage.getUserById(secondId).getFriends().remove(firstId);
-        log.debug("У второго юзера стало {} друзей", userStorage.getUserById(secondId).getFriends().size());
-    }
-
-    public List<User> getAllFriends(int id) {
-        List<User> resultList = new ArrayList<>();
-        if (id < 0) {
-            log.debug("Отрицательный id");
-            throw new NotFoundException("Отрицательного id не может быть");
-        }
-        for (Integer friendId : userStorage.getUserById(id).getFriends()) {
-            resultList.add(userStorage.getUserById(friendId));
-        }
-        log.debug("Друзей по запросу выдано {} ", resultList.size());
-        return resultList;
-    }
-
-    public List<User> getCommonFriends(int id, int otherId) {
-        List<User> resultList = new ArrayList<>();
-        if ((userStorage.getUserById(id).getFriends() == null) || (userStorage.getUserById(otherId).getFriends() == null)) {
-            return resultList;
-        }
-        List<Integer> commonFriends = new ArrayList<>(userStorage.getUserById(id).getFriends());
-        commonFriends.retainAll(userStorage.getUserById(otherId).getFriends());
-        for (Integer friendId : commonFriends) {
-            resultList.add(userStorage.getUserById(friendId));
-        }
-        log.debug("Общих друзей по запросу выдано {} ", resultList.size());
-        return resultList;
+    public User getUserById(int id) {
+        return userStorage.getUserById(id);
     }
 
     public Collection<User> getAll() {
@@ -87,11 +35,23 @@ public class UserService {
         return userStorage.modifyUser(user);
     }
 
-    public User deleteUser(int id) {
-        return userStorage.deleteUser(id);
+    public List<User> getAllFriends(int id) {
+        return userStorage.getAllConfirmedFriends(id);
     }
 
-    public User getUserById(int id) {
-        return userStorage.getUserById(id);
+    public void setFriendship(int firstId, int secondId) {
+        userStorage.setFriendship(firstId, secondId);
+    }
+
+    public void breakFriendship(int firstId, int secondId) {
+        userStorage.breakFriendship(firstId, secondId);
+    }
+
+    public void deleteUser(int id) {
+        userStorage.deleteUser(id);
+    }
+
+    public Collection<User> getCommonFriends(int id, int otherId) {
+        return userStorage.getCommonFriends(id, otherId);
     }
 }
